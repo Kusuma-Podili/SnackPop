@@ -34,7 +34,6 @@ wheels/
 htmlcov/
 
 # IDE / Editor
-.vscode/
 .idea/
 *.swp
 *.swo
