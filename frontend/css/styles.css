@@ -1,0 +1,234 @@
+/* Food Truck Tycoon - Production Styling */
+:root {
+  --bg-creamy: #FAF7F2;
+  --bg-card: #FFFFFF;
+  --primary-orange: #FF6B35;
+  --primary-dark: #D9480F;
+  --accent-amber: #F59E0B;
+  --accent-tomato: #EF4444;
+  --accent-green: #10B981;
+  --accent-blue: #3B82F6;
+  --text-dark: #1E293B;
+  --text-muted: #64748B;
+  --border-subtle: #E2E8F0;
+  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  --card-shadow-hover: 0 10px 30px -4px rgba(255, 107, 53, 0.15), 0 4px 10px -2px rgba(0, 0, 0, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+  background-color: var(--bg-creamy);
+  color: var(--text-dark);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F1EBE1;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-orange);
+}
+
+/* Glass & Card Styles */
+.tycoon-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  box-shadow: var(--card-shadow);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tycoon-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  border-color: #FDBA74;
+}
+
+/* Primary Button with Warm Gradient & Tactile Feel */
+.btn-primary {
+  background: linear-gradient(135deg, #FF6B35 0%, #EA580C 100%);
+  color: #FFFFFF;
+  font-weight: 700;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+  transition: all 0.15s ease-in-out;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.35);
+}
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-secondary {
+  background: #FFFFFF;
+  color: var(--text-dark);
+  border: 1.5px solid #E2E8F0;
+  font-weight: 600;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+}
+.btn-secondary:hover {
+  border-color: #CBD5E1;
+  background: #F8FAFC;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  font-weight: 700;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+}
+
+/* Animations */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.03); }
+}
+.pulse-glow {
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes bounceSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.bounce-slow {
+  animation: bounceSlow 3s infinite ease-in-out;
+}
+
+/* Gauge Meter for Cooking Timing Station */
+.timing-track {
+  position: relative;
+  width: 100%;
+  height: 28px;
+  background: #E2E8F0;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.timing-zone-undercook {
+  position: absolute;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: #93C5FD;
+}
+.timing-zone-good {
+  position: absolute;
+  left: 50%;
+  width: 25%;
+  height: 100%;
+  background: #FDE047;
+}
+.timing-zone-perfect {
+  position: absolute;
+  left: 75%;
+  width: 15%;
+  height: 100%;
+  background: #86EFAC;
+}
+.timing-zone-burned {
+  position: absolute;
+  left: 90%;
+  width: 10%;
+  height: 100%;
+  background: #FCA5A5;
+}
+.timing-needle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: #0F172A;
+  border-radius: 3px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.5);
+  transition: left 0.05s linear;
+}
+
+/* Badge Styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+.badge-orange { background: #FFEDD5; color: #C2410C; }
+.badge-green { background: #DCFCE7; color: #15803D; }
+.badge-blue { background: #DBEAFE; color: #1D4ED8; }
+.badge-yellow { background: #FEF9C3; color: #A16207; }
+.badge-red { background: #FEE2E2; color: #B91C1C; }
+.badge-purple { background: #F3E8FF; color: #7E22CE; }
+
+/* Toast Styling */
+#toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 380px;
+}
+.toast-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  border-radius: 0.85rem;
+  background: #1E293B;
+  color: #FFFFFF;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-size: 0.9rem;
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}

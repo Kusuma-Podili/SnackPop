@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Truck Tycoon - Cooking & Business Simulator</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            creamy: '#FAF7F2',
+            tycoon: {
+              orange: '#FF6B35',
+              darkorange: '#D9480F',
+              amber: '#F59E0B',
+              tomato: '#EF4444',
+              green: '#10B981',
+              charcoal: '#1E293B',
+              cream: '#FFFDF9'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/css/styles.css">
+
+  <!-- Chart.js for Business Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-[#FAF7F2] text-slate-800 flex flex-col min-h-screen">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Global Daily Reward / Event Modal Container -->
+  <div id="modal-container" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"></div>
+
+  <!-- Top Global HUD (Visible when logged in) -->
+  <header id="top-hud" class="hidden bg-white border-b border-orange-100 shadow-sm sticky top-0 z-40 px-4 py-2.5">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand & Location -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-400 flex items-center justify-center text-2xl shadow-md shadow-orange-200">
+          🚚
+        </div>
+        <div>
+          <h1 class="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight leading-none">Food Truck Tycoon</h1>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span id="hud-location-icon" class="text-xs">🏙️</span>
+            <span id="hud-location-name" class="text-xs font-semibold text-orange-600 uppercase tracking-wide">City Street</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Player Stats HUD -->
+      <div class="flex items-center gap-2 sm:gap-4 ml-auto">
+        <!-- Level & XP -->
+        <div class="flex flex-col items-end min-w-[110px] sm:min-w-[140px]">
+          <div class="flex items-center gap-1.5">
+            <span id="hud-level" class="text-xs font-extrabold px-1.5 py-0.5 rounded bg-orange-100 text-orange-700">Lvl 1</span>
+            <span id="hud-xp-text" class="text-[11px] font-bold text-slate-500">0 / 100 XP</span>
+          </div>
+          <div class="w-full bg-slate-100 h-2 rounded-full mt-1 overflow-hidden border border-slate-200">
+            <div id="hud-xp-bar" class="bg-gradient-to-r from-orange-500 to-amber-400 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Coins -->
+        <div class="flex items-center gap-1.5 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl shadow-xs">
+          <span class="text-base">💰</span>
+          <span id="hud-coins" class="font-extrabold text-sm sm:text-base text-amber-900">500</span>
+        </div>
+
+        <!-- Reputation -->
+        <div class="flex items-center gap-1 bg-yellow-50 border border-yellow-200 px-2.5 py-1.5 rounded-xl shadow-xs">
+          <span id="hud-reputation" class="font-bold text-xs sm:text-sm text-yellow-800">⭐ 4.0</span>
+        </div>
+
+        <!-- Audio Toggle Button -->
+        <button id="btn-audio-toggle" onclick="window.app.toggleAudio()" title="Toggle Sound" class="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition">
+          <span id="audio-icon" class="text-base">🔊</span>
+        </button>
+
+        <!-- Player Profile & Menu -->
+        <button onclick="window.app.showView('profile')" class="flex items-center gap-2 hover:bg-orange-50 p-1.5 rounded-xl transition border border-transparent hover:border-orange-200">
+          <div class="w-8 h-8 rounded-full bg-orange-500 text-white font-bold flex items-center justify-center text-sm shadow-xs">
+            👨‍🍳
+          </div>
+          <span id="hud-player-name" class="hidden md:inline font-bold text-sm text-slate-700">Chef Mario</span>
+        </button>
+
+        <!-- Logout Button -->
+        <button onclick="window.app.logout()" title="Logout" class="p-2 rounded-xl text-red-500 hover:bg-red-50 transition border border-transparent hover:border-red-200">
+          <span class="text-sm font-bold">🚪</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- App Main Layout -->
+  <div class="flex-1 flex w-full max-w-7xl mx-auto px-2 sm:px-4 py-4 gap-4">
+    
+    <!-- Sidebar Navigation (Visible when logged in) -->
+    <aside id="sidebar-nav" class="hidden w-56 flex-shrink-0 flex-col gap-1 bg-white p-3 rounded-2xl border border-orange-100 shadow-sm h-fit sticky top-20">
+      
+      <!-- Player Links -->
+      <div id="player-nav-links" class="flex flex-col gap-1">
+        <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-3 py-1">Tycoon Hub</div>
+        
+        <button onclick="window.app.showView('dashboard')" data-nav="dashboard" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition text-left">
+          <span>📊</span> Dashboard
+        </button>
+
+        <button onclick="window.app.showView('cooking')" data-nav="cooking" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition text-left">
+          <span class="pulse-glow">🍳</span> Play / Kitchen
+        </button>
+
+        <button onclick="window.app.showView('truck')" data-nav="truck" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition text-left">
+          <span>🚚</span> Food Truck
+        </button>
+
+        <button onclick="window.app.showView('menu')" data-nav="menu" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition text-left">
+          <span>📜</span> Menu & Recipes
+        </button>
+
+        <button onclick="window.app.showView('inventory')" data-nav="inventory" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition text-left">
+          <span>📦</span> Inventory Market
+        </button>
+
+        <button onclick="window.app.showView('locations')" data-nav="locations" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition text-left">
+          <span>🗺️</span> Locations
+        </button>
+
+        <button onclick="window.app.showView('orders')" data-nav="orders" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition text-left">
+          <span>📋</span> Order Ledger
+        </button>
+
+        <button onclick="window.app.showView('missions')" data-nav="missions" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition text-left">
+          <span>🎯</span> Missions
+        </button>
+
+        <button onclick="window.app.showView('achievements')" data-nav="achievements" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition text-left">
+          <span>🏆</span> Achievements
+        </button>
+
+        <button onclick="window.app.showView('leaderboard')" data-nav="leaderboard" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition text-left">
+          <span>🏅</span> Leaderboard
+        </button>
+
+        <button onclick="window.app.showView('analytics')" data-nav="analytics" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition text-left">
+          <span>📈</span> Analytics
+        </button>
+      </div>
+
+      <!-- Admin Links (Role-gated) -->
+      <div id="admin-nav-links" class="hidden flex flex-col gap-1 border-t border-slate-100 pt-2 mt-2">
+        <div class="text-[10px] font-extrabold uppercase tracking-wider text-purple-600 px-3 py-1">Admin Portal</div>
+        
+        <button onclick="window.app.showView('admin-dashboard')" data-nav="admin-dashboard" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-purple-50 hover:text-purple-600 transition text-left">
+          <span>⚙️</span> Admin Overview
+        </button>
+
+        <button onclick="window.app.showView('admin-players')" data-nav="admin-players" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-purple-50 hover:text-purple-600 transition text-left">
+          <span>👥</span> Players
+        </button>
+
+        <button onclick="window.app.showView('admin-foods')" data-nav="admin-foods" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-purple-50 hover:text-purple-600 transition text-left">
+          <span>🍔</span> Food & Recipes
+        </button>
+
+        <button onclick="window.app.showView('admin-settings')" data-nav="admin-settings" class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl font-bold text-sm text-slate-600 hover:bg-purple-50 hover:text-purple-600 transition text-left">
+          <span>🎛️</span> Balance & Settings
+        </button>
+      </div>
+
+      <!-- Daily Reward Claim Banner -->
+      <div class="mt-4 p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-sm flex flex-col items-center text-center gap-1.5">
+        <span class="text-2xl">🎁</span>
+        <span class="text-xs font-bold leading-tight">Daily Login Streak</span>
+        <button onclick="window.app.openDailyRewardsModal()" class="w-full mt-1 bg-white text-orange-600 text-xs font-extrabold py-1.5 rounded-lg hover:bg-orange-50 shadow-xs transition">
+          Claim Day Bonus
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- Main View Dynamic Container -->
+    <main id="app-view" class="flex-1 w-full min-w-0">
+      <!-- Views will be dynamically injected here -->
+    </main>
+
+  </div>
+
+  <!-- Mobile Bottom Nav Bar -->
+  <nav id="mobile-nav" class="hidden md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 px-2 py-1.5 flex justify-around items-center">
+    <button onclick="window.app.showView('dashboard')" class="flex flex-col items-center text-[10px] font-bold text-slate-600 p-1">
+      <span class="text-lg">📊</span> Home
+    </button>
+    <button onclick="window.app.showView('cooking')" class="flex flex-col items-center text-[10px] font-bold text-orange-600 p-1">
+      <span class="text-lg">🍳</span> Play
+    </button>
+    <button onclick="window.app.showView('truck')" class="flex flex-col items-center text-[10px] font-bold text-slate-600 p-1">
+      <span class="text-lg">🚚</span> Truck
+    </button>
+    <button onclick="window.app.showView('inventory')" class="flex flex-col items-center text-[10px] font-bold text-slate-600 p-1">
+      <span class="text-lg">📦</span> Stock
+    </button>
+    <button onclick="window.app.showView('missions')" class="flex flex-col items-center text-[10px] font-bold text-slate-600 p-1">
+      <span class="text-lg">🎯</span> Goals
+    </button>
+  </nav>
+
+  <!-- Load JavaScript Modules -->
+  <script src="/static/js/audio.js"></script>
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/state.js"></script>
+  <script src="/static/js/components/toast.js"></script>
+  <script src="/static/js/components/modal.js"></script>
+  
+  <!-- Views -->
+  <script src="/static/js/views/landing.js"></script>
+  <script src="/static/js/views/auth.js"></script>
+  <script src="/static/js/views/dashboard.js"></script>
+  <script src="/static/js/views/truck.js"></script>
+  <script src="/static/js/views/cooking.js"></script>
+  <script src="/static/js/views/menu.js"></script>
+  <script src="/static/js/views/inventory.js"></script>
+  <script src="/static/js/views/locations.js"></script>
+  <script src="/static/js/views/orders.js"></script>
+  <script src="/static/js/views/missions.js"></script>
+  <script src="/static/js/views/achievements.js"></script>
+  <script src="/static/js/views/leaderboard.js"></script>
+  <script src="/static/js/views/analytics.js"></script>
+  <script src="/static/js/views/profile.js"></script>
+  <script src="/static/js/views/admin.js"></script>
+
+  <!-- App Bootstrap -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
