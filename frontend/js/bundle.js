@@ -1,9 +1,9 @@
 /**
- * SnackPop Complete Runtime Bundle - Food Merge-2 / Sequence Pop Edition
+ * SnackPop Complete Runtime Bundle - Master Match-3 / Merge-3 Edition
  * 
- * When 2 or more similar items are in sequence/adjacent, the player merges them,
- * they animate and disappear with juicy particle explosions, new foods drop down,
- * and the game progresses through levels, combos, and ends in victory!
+ * Players swap adjacent food items or tap groups of 3 or more identical items (🍕🍔🍩🍓🍰🍟)
+ * to merge and pop them. Matched items disappear with juice animations, new foods fall into place,
+ * and the game waits for player interactions across 50 progressive levels.
  */
 
 // Core Enums
@@ -32,7 +32,7 @@ export const LevelObjectiveType = {
   COLLECT_INGREDIENTS: 'COLLECT_INGREDIENTS'
 };
 
-// Procedural Audio Engine
+// Procedural Web Audio Synthesizer
 export class SoundFXEngine {
   static audioCtx = null;
   static masterGain = null;
@@ -71,35 +71,30 @@ export class SoundFXEngine {
     const now = this.audioCtx.currentTime;
     osc.type = 'sine';
     osc.frequency.setValueAtTime(320, now);
-    osc.frequency.exponentialRampToValueAtTime(600, now + 0.08);
+    osc.frequency.exponentialRampToValueAtTime(580, now + 0.08);
     g.gain.setValueAtTime(0.3, now);
     g.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
     osc.connect(g); g.connect(this.sfxGain);
     osc.start(now); osc.stop(now + 0.09);
   }
 
-  static playMerge(size = 2) {
+  static playMatch(cascadeIndex = 1) {
     this.init(); this.resume();
     if (!this.audioCtx || this.isMuted) return;
-    const ctx = this.audioCtx;
-    const now = ctx.currentTime;
-    const baseFreq = size >= 4 ? 659.25 : (size >= 3 ? 523.25 : 392.00);
-
-    const osc1 = ctx.createOscillator();
-    const osc2 = ctx.createOscillator();
-    const g = ctx.createGain();
-
-    osc1.type = 'triangle';
-    osc2.type = 'sine';
-    osc1.frequency.setValueAtTime(baseFreq, now);
-    osc2.frequency.setValueAtTime(baseFreq * 1.5, now);
-
-    g.gain.setValueAtTime(0.45, now);
-    g.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-
+    const idx = Math.min(cascadeIndex - 1, this.CASCADE_FREQS.length - 1);
+    const freq = this.CASCADE_FREQS[Math.max(0, idx)];
+    const osc1 = this.audioCtx.createOscillator();
+    const osc2 = this.audioCtx.createOscillator();
+    const g = this.audioCtx.createGain();
+    const now = this.audioCtx.currentTime;
+    osc1.type = 'triangle'; osc2.type = 'sine';
+    osc1.frequency.setValueAtTime(freq, now);
+    osc2.frequency.setValueAtTime(freq * 2, now);
+    g.gain.setValueAtTime(0.4, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
     osc1.connect(g); osc2.connect(g); g.connect(this.sfxGain);
     osc1.start(now); osc2.start(now);
-    osc1.stop(now + 0.26); osc2.stop(now + 0.26);
+    osc1.stop(now + 0.3); osc2.stop(now + 0.3);
   }
 
   static playInvalid() {
@@ -387,7 +382,7 @@ export class SaveSystem {
   }
 }
 
-// 50 Levels Generator
+// 50 Handcrafted Levels
 export const ALL_LEVELS = [];
 for (let i = 1; i <= 50; i++) {
   const worldNum = Math.ceil(i / 10);
@@ -398,8 +393,8 @@ for (let i = 1; i <= 50; i++) {
     worldName: worldNames[worldNum],
     title: `Level ${i}`,
     moves: Math.max(15, 30 - Math.floor(i / 2)),
-    targetScore: 1200 + i * 1400,
-    starThresholds: [1200 + i * 1400, 3000 + i * 2200, 5500 + i * 3500],
+    targetScore: 1500 + i * 1500,
+    starThresholds: [1500 + i * 1500, 3500 + i * 2500, 6500 + i * 4000],
     objectiveType: LevelObjectiveType.TARGET_SCORE,
     allowedFoods: [FoodType.PIZZA, FoodType.BURGER, FoodType.DONUT, FoodType.STRAWBERRY, FoodType.CAKE, FoodType.FRIES]
   });
@@ -432,8 +427,8 @@ export class FoodSprites {
   }
 }
 
-// Match-2 / Sequence Merge Game Engine
-export class Merge2GameEngine {
+// Player-Controlled Match-3 / Merge-3 Game Engine
+export class Match3GameEngine {
   constructor(level, onWin, onLose, onBackToMap) {
     this.level = level;
     this.onWin = onWin;
@@ -447,19 +442,38 @@ export class Merge2GameEngine {
     this.selected = null;
     this.isProcessing = false;
 
-    this.initGrid();
+    this.initBoardWithoutMatches();
   }
 
-  initGrid() {
+  // Generate an 8x8 board with NO initial 3-in-a-row matches
+  initBoardWithoutMatches() {
     const foods = [FoodType.PIZZA, FoodType.BURGER, FoodType.DONUT, FoodType.STRAWBERRY, FoodType.CAKE, FoodType.FRIES];
     this.grid = [];
+
     for (let r = 0; r < this.rows; r++) {
       const row = [];
       for (let c = 0; c < this.cols; c++) {
+        const forbidden = new Set();
+        if (c >= 2) {
+          const l1 = row[c - 1]?.foodType;
+          const l2 = row[c - 2]?.foodType;
+          if (l1 && l1 === l2) forbidden.add(l1);
+        }
+        if (r >= 2) {
+          const u1 = this.grid[r - 1][c]?.foodType;
+          const u2 = this.grid[r - 2][c]?.foodType;
+          if (u1 && u1 === u2) forbidden.add(u1);
+        }
+
+        const available = foods.filter(f => !forbidden.has(f));
+        const chosen = available.length > 0
+          ? available[Math.floor(Math.random() * available.length)]
+          : foods[Math.floor(Math.random() * foods.length)];
+
         row.push({
           row: r,
           col: c,
-          foodType: foods[Math.floor(Math.random() * foods.length)],
+          foodType: chosen,
           specialType: SpecialType.NONE
         });
       }
@@ -467,7 +481,53 @@ export class Merge2GameEngine {
     }
   }
 
-  // Find all connected similar food items in sequence (horizontal or vertical connected cluster of 2+)
+  // Scan grid for horizontal and vertical lines of 3 or more identical foods
+  findLineMatches() {
+    const matches = [];
+
+    // Horizontal 3+ matches
+    for (let r = 0; r < this.rows; r++) {
+      let count = 1;
+      for (let c = 1; c < this.cols; c++) {
+        if (this.grid[r][c].foodType && this.grid[r][c].foodType === this.grid[r][c - 1].foodType) {
+          count++;
+        } else {
+          if (count >= 3) {
+            for (let i = c - count; i < c; i++) matches.push({ r, c: i });
+          }
+          count = 1;
+        }
+      }
+      if (count >= 3) {
+        for (let i = this.cols - count; i < this.cols; i++) matches.push({ r, c: i });
+      }
+    }
+
+    // Vertical 3+ matches
+    for (let c = 0; c < this.cols; c++) {
+      let count = 1;
+      for (let r = 1; r < this.rows; r++) {
+        if (this.grid[r][c].foodType && this.grid[r][c].foodType === this.grid[r - 1][c].foodType) {
+          count++;
+        } else {
+          if (count >= 3) {
+            for (let i = r - count; i < r; i++) matches.push({ r: i, c });
+          }
+          count = 1;
+        }
+      }
+      if (count >= 3) {
+        for (let i = this.rows - count; i < this.rows; i++) matches.push({ r: i, c });
+      }
+    }
+
+    // Deduplicate
+    const map = new Map();
+    matches.forEach(m => map.set(`${m.r},${m.c}`, m));
+    return Array.from(map.values());
+  }
+
+  // Find all connected identical foods starting at (r, c)
   getConnectedGroup(startR, startC) {
     const targetType = this.grid[startR][startC]?.foodType;
     if (!targetType) return [];
@@ -501,67 +561,102 @@ export class Merge2GameEngine {
     return group;
   }
 
-  // Scan entire board for all groups of 2 or more identical items in sequence
-  findAllMergeGroups() {
-    const visited = Array.from({ length: this.rows }, () => Array(this.cols).fill(false));
-    const allGroups = [];
+  // Executes player swap between adjacent tiles
+  async handleSwap(posA, posB, renderCallback) {
+    if (this.isProcessing) return;
+    this.isProcessing = true;
 
-    for (let r = 0; r < this.rows; r++) {
+    SoundFXEngine.playSwap();
+
+    // Perform swap
+    const temp = this.grid[posA.row][posA.col].foodType;
+    this.grid[posA.row][posA.col].foodType = this.grid[posB.row][posB.col].foodType;
+    this.grid[posB.row][posB.col].foodType = temp;
+    renderCallback();
+
+    // Check for 3+ matches formed by swap
+    const matches = this.findLineMatches();
+
+    if (matches.length === 0) {
+      // Revert swap if no match of 3+ formed
+      await new Promise(res => setTimeout(res, 220));
+      SoundFXEngine.playInvalid();
+      const rev = this.grid[posA.row][posA.col].foodType;
+      this.grid[posA.row][posA.col].foodType = this.grid[posB.row][posB.col].foodType;
+      this.grid[posB.row][posB.col].foodType = rev;
+      renderCallback();
+      this.isProcessing = false;
+      return;
+    }
+
+    // Valid Player Match!
+    this.movesRemaining--;
+    await this.resolveMatchesAndCascades(matches, renderCallback);
+    this.isProcessing = false;
+  }
+
+  // Player directly merges 3+ connected items
+  async handleGroupMerge(group, renderCallback) {
+    if (this.isProcessing || group.length < 3) return;
+    this.isProcessing = true;
+
+    this.movesRemaining--;
+    await this.resolveMatchesAndCascades(group, renderCallback);
+    this.isProcessing = false;
+  }
+
+  // Resolves match, triggers particles, drops foods, and checks natural falling cascades
+  async resolveMatchesAndCascades(initialMatches, renderCallback) {
+    let currentMatches = initialMatches;
+    let cascadeIndex = 1;
+
+    while (currentMatches.length >= 3 && cascadeIndex <= 6) {
+      SoundFXEngine.playMatch(cascadeIndex);
+      const points = currentMatches.length * 60 * cascadeIndex;
+      this.score += points;
+
+      // Particles & clear
+      currentMatches.forEach(pos => {
+        const cellEl = document.querySelector(`.grid-cell[data-r="${pos.r}"][data-c="${pos.c}"]`);
+        if (cellEl) {
+          const rect = cellEl.getBoundingClientRect();
+          ParticleEmitter.spawnFoodCrumbs(rect.left + rect.width / 2, rect.top + rect.height / 2, 16);
+        }
+        this.grid[pos.r][pos.c].foodType = null;
+      });
+
+      renderCallback();
+      await new Promise(res => setTimeout(res, 220));
+
+      // Gravity: Drop downward
+      const foods = [FoodType.PIZZA, FoodType.BURGER, FoodType.DONUT, FoodType.STRAWBERRY, FoodType.CAKE, FoodType.FRIES];
       for (let c = 0; c < this.cols; c++) {
-        if (!visited[r][c] && this.grid[r][c]?.foodType) {
-          const grp = this.getConnectedGroup(r, c);
-          grp.forEach(p => visited[p.r][p.c] = true);
-          if (grp.length >= 2) {
-            allGroups.push(grp);
+        for (let r = this.rows - 1; r >= 0; r--) {
+          if (this.grid[r][c].foodType === null) {
+            for (let above = r - 1; above >= 0; above--) {
+              if (this.grid[above][c].foodType !== null) {
+                this.grid[r][c].foodType = this.grid[above][c].foodType;
+                this.grid[above][c].foodType = null;
+                break;
+              }
+            }
+          }
+        }
+
+        // Fill from top
+        for (let r = 0; r < this.rows; r++) {
+          if (this.grid[r][c].foodType === null) {
+            this.grid[r][c].foodType = foods[Math.floor(Math.random() * foods.length)];
           }
         }
       }
-    }
-    return allGroups;
-  }
 
-  // Merges and pops a sequence of 2+ similar items
-  async mergeGroup(group, renderCallback, isCascade = false) {
-    if (group.length < 2) return;
-    this.isProcessing = true;
+      renderCallback();
+      await new Promise(res => setTimeout(res, 220));
 
-    const mergeCount = group.length;
-    SoundFXEngine.playMerge(mergeCount);
-
-    // Points: 2 items = 100 pts, 3 items = 200 pts, 4 items = 350 pts, 5+ = 500+ pts
-    const bonus = mergeCount >= 4 ? 2.0 : (mergeCount >= 3 ? 1.5 : 1.0);
-    const points = Math.round(mergeCount * 50 * bonus);
-    this.score += points;
-
-    if (!isCascade) {
-      this.movesRemaining--;
-    }
-
-    // Visual: spawn crumbs and clear tiles
-    group.forEach(pos => {
-      const cellEl = document.querySelector(`.grid-cell[data-r="${pos.r}"][data-c="${pos.c}"]`);
-      if (cellEl) {
-        const rect = cellEl.getBoundingClientRect();
-        ParticleEmitter.spawnFoodCrumbs(rect.left + rect.width / 2, rect.top + rect.height / 2, 18);
-      }
-      this.grid[pos.r][pos.c].foodType = null;
-    });
-
-    renderCallback();
-    await new Promise(res => setTimeout(res, 220));
-
-    // Gravity: foods fall down and new foods spawn
-    await this.applyGravityAndRefill(renderCallback);
-
-    // Check for automatic cascades of 2+ items
-    let cascadeGroups = this.findAllMergeGroups();
-    let cascadeCount = 1;
-    while (cascadeGroups.length > 0 && cascadeCount < 8) {
-      await new Promise(res => setTimeout(res, 240));
-      const biggestGroup = cascadeGroups.reduce((prev, cur) => cur.length > prev.length ? cur : prev, cascadeGroups[0]);
-      await this.mergeGroup(biggestGroup, renderCallback, true);
-      cascadeCount++;
-      cascadeGroups = this.findAllMergeGroups();
+      cascadeIndex++;
+      // Check if newly dropped items formed a 3-in-a-line match
+      currentMatches = this.findLineMatches();
     }
 
     // Check Win / Loss
@@ -575,94 +670,44 @@ export class Merge2GameEngine {
       SoundFXEngine.playDefeat();
       this.onLose(this.score);
     }
-
-    this.isProcessing = false;
   }
 
-  async applyGravityAndRefill(renderCallback) {
-    const foods = [FoodType.PIZZA, FoodType.BURGER, FoodType.DONUT, FoodType.STRAWBERRY, FoodType.CAKE, FoodType.FRIES];
-
-    // Drop downward
-    for (let c = 0; c < this.cols; c++) {
-      for (let r = this.rows - 1; r >= 0; r--) {
-        if (this.grid[r][c].foodType === null) {
-          for (let above = r - 1; above >= 0; above--) {
-            if (this.grid[above][c].foodType !== null) {
-              this.grid[r][c].foodType = this.grid[above][c].foodType;
-              this.grid[above][c].foodType = null;
-              break;
-            }
-          }
-        }
-      }
-
-      // Fill empty slots from top
-      for (let r = 0; r < this.rows; r++) {
-        if (this.grid[r][c].foodType === null) {
-          this.grid[r][c].foodType = foods[Math.floor(Math.random() * foods.length)];
-        }
-      }
-    }
-
-    renderCallback();
-  }
-
-  // Handle Player Clicking a Food Item
-  async handleCellClick(r, c, renderCallback) {
+  // Handle cell clicks
+  handleCellClick(r, c, renderCallback) {
     if (this.isProcessing) return;
 
+    // Check if player clicked a cluster of 3 or more identical items
     const group = this.getConnectedGroup(r, c);
-
-    if (group.length >= 2) {
-      // Direct merge & pop!
+    if (group.length >= 3) {
       this.selected = null;
-      await this.mergeGroup(group, renderCallback);
+      this.handleGroupMerge(group, renderCallback);
+      return;
+    }
+
+    // Otherwise handle swap selection
+    if (!this.selected) {
+      SoundFXEngine.playClick();
+      this.selected = { row: r, col: c };
+      renderCallback();
     } else {
-      // If solitary item clicked, check if player is swapping with adjacent item
-      if (!this.selected) {
+      const first = this.selected;
+      this.selected = null;
+
+      if (first.row === r && first.col === c) {
+        // Deselect
+        renderCallback();
+        return;
+      }
+
+      const dR = Math.abs(first.row - r);
+      const dC = Math.abs(first.col - c);
+
+      if ((dR === 1 && dC === 0) || (dR === 0 && dC === 1)) {
+        this.handleSwap(first, { row: r, col: c }, renderCallback);
+      } else {
         SoundFXEngine.playClick();
         this.selected = { row: r, col: c };
         renderCallback();
-      } else {
-        const first = this.selected;
-        this.selected = null;
-
-        if (first.row === r && first.col === c) {
-          renderCallback();
-          return;
-        }
-
-        const dR = Math.abs(first.row - r);
-        const dC = Math.abs(first.col - c);
-
-        if ((dR === 1 && dC === 0) || (dR === 0 && dC === 1)) {
-          // Swap
-          SoundFXEngine.playSwap();
-          const temp = this.grid[first.row][first.col].foodType;
-          this.grid[first.row][first.col].foodType = this.grid[r][c].foodType;
-          this.grid[r][c].foodType = temp;
-          renderCallback();
-
-          // Check if swap created any 2+ sequence
-          const groupA = this.getConnectedGroup(r, c);
-          const groupB = this.getConnectedGroup(first.row, first.col);
-
-          if (groupA.length >= 2 || groupB.length >= 2) {
-            const targetGroup = groupA.length >= 2 ? groupA : groupB;
-            await this.mergeGroup(targetGroup, renderCallback);
-          } else {
-            // Revert swap if no 2+ match formed
-            await new Promise(res => setTimeout(res, 220));
-            SoundFXEngine.playInvalid();
-            const rev = this.grid[first.row][first.col].foodType;
-            this.grid[first.row][first.col].foodType = this.grid[r][c].foodType;
-            this.grid[r][c].foodType = rev;
-            renderCallback();
-          }
-        } else {
-          this.selected = { row: r, col: c };
-          renderCallback();
-        }
       }
     }
   }
@@ -732,7 +777,7 @@ class SnackPopClient {
         <div class="map-top-bar">
           <div class="map-brand">
             <span class="brand-icon">🍕</span>
-            <span class="brand-title">SnackPop: Merge 2 Saga</span>
+            <span class="brand-title">SnackPop Saga</span>
           </div>
           <div class="map-stats-tray">
             <div class="stat-pill"><span class="pill-icon">❤️</span> 5/5</div>
@@ -742,7 +787,7 @@ class SnackPopClient {
         </div>
 
         <div style="background: rgba(245, 158, 11, 0.18); border: 1px solid #F59E0B; border-radius: 14px; padding: 10px 14px; margin-bottom: 16px; font-size: 0.85rem; text-align: center; color: #FEF3C7;">
-          ✨ <strong>HOW TO PLAY:</strong> Tap any <strong>2 or more identical foods</strong> in sequence to merge and pop them, or swap adjacent items!
+          ✨ <strong>HOW TO PLAY:</strong> Swap adjacent foods or tap <strong>3 or more identical items</strong> to merge and pop them!
         </div>
 
         <div class="worlds-journey-container">
@@ -798,7 +843,7 @@ class SnackPopClient {
   }
 
   startGame(level) {
-    const game = new Merge2GameEngine(
+    const game = new Match3GameEngine(
       level,
       (score, stars) => {
         alert(`🎉 LEVEL COMPLETED!\nScore: ${score.toLocaleString()} / ${level.targetScore.toLocaleString()}\nStars: ${'⭐'.repeat(stars)}\nReward: +${stars * 35} Coins!`);
@@ -850,7 +895,7 @@ class SnackPopClient {
           </div>
 
           <div style="font-size: 0.8rem; color: #FDE047; margin-bottom: 8px; text-align: center;">
-            💡 Tap any <strong>2+ identical adjacent foods</strong> to merge & pop them!
+            💡 Swap adjacent items or tap <strong>3+ identical foods</strong> to merge & pop!
           </div>
 
           <div class="board-stage">
