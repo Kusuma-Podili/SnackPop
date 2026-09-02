@@ -20,6 +20,8 @@ from backend.app.api.v1.truck import router as truck_router
 from backend.app.api.v1.inventory import router as inventory_router
 from backend.app.api.v1.rewards import router as rewards_router
 from backend.app.api.v1.transactions import router as transactions_router
+from backend.app.api.v1.orders import router as orders_router
+from backend.app.api.v1.cooking import router as cooking_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -54,6 +56,8 @@ app.include_router(truck_router, prefix=settings.API_V1_STR)
 app.include_router(inventory_router, prefix=settings.API_V1_STR)
 app.include_router(rewards_router, prefix=settings.API_V1_STR)
 app.include_router(transactions_router, prefix=settings.API_V1_STR)
+app.include_router(orders_router, prefix=settings.API_V1_STR)
+app.include_router(cooking_router, prefix=settings.API_V1_STR)
 
 # Mount Frontend Static Assets
 frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend"))
