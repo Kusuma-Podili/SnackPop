@@ -146,3 +146,28 @@ async def get_recipes():
             lore="Glazed with organic alpine strawberry nectar and sprinkled with edible gold flakes."
         )
     ]
+
+# Authentication Endpoints
+@router.post("/auth/login")
+async def auth_login(data: dict = None):
+    return {
+        "success": True,
+        "token": "snackpop_jwt_token_master_chef",
+        "user": {
+            "id": "player_chef_1",
+            "username": "MasterChef",
+            "email": "chef@snackpop.dev"
+        }
+    }
+
+@router.post("/auth/register")
+async def auth_register(data: dict = None):
+    return {
+        "success": True,
+        "token": "snackpop_jwt_token_master_chef",
+        "user": {
+            "id": "player_chef_1",
+            "username": "MasterChef",
+            "email": "chef@snackpop.dev"
+        }
+    }
