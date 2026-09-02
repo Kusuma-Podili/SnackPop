@@ -67,9 +67,9 @@ for (let i = 1; i <= 10; i++) {
       ? 'Clear away all the sweet frosting glazes by matching adjacent bakery snacks!'
       : 'Score enough points by matching sweet breakfast delights within the move limit!',
     objectiveType: isFrostingLevel ? LevelObjectiveType.CLEAR_FROSTING : LevelObjectiveType.TARGET_SCORE,
-    moves: Math.max(18, 30 - i),
-    targetScore: 2500 + i * 1500,
-    starThresholds: [2500 + i * 1500, 5000 + i * 2500, 8500 + i * 3500],
+    moves: Math.max(10, Math.round(25 - (i - 1) * (15 / 49))),
+    targetScore: 1000 + (i - 1) * 350,
+    starThresholds: [1000 + (i - 1) * 350, 2000 + (i - 1) * 500, 3500 + (i - 1) * 800],
     targetFrostingCount: isFrostingLevel ? initialFrostings.length : undefined,
     boardConfig: {
       rows: 8,

@@ -556,19 +556,23 @@ export class SaveSystem {
   }
 }
 
-// 50 Levels Configuration
+// 50 Levels Configuration (Starts at 25 moves, scales down to minimum 10 moves)
 export const ALL_LEVELS = [];
 for (let i = 1; i <= 50; i++) {
   const worldNum = Math.ceil(i / 10);
   const worldNames = ['', 'Morning Bakery', 'Fast Food Fiesta', 'Italian Piazza', 'Sweet Tooth Kingdom', 'Gourmet Galaxy'];
+  // Progressive moves formula: Level 1 = 25 moves, Level 50 = 10 moves
+  const moves = Math.max(10, Math.round(25 - (i - 1) * (15 / 49)));
+  const targetScore = 1000 + (i - 1) * 350;
+
   ALL_LEVELS.push({
     levelNumber: i,
     worldNumber: worldNum,
     worldName: worldNames[worldNum],
     title: `Level ${i}`,
-    moves: Math.max(15, 30 - Math.floor(i / 2)),
-    targetScore: 1200 + i * 1400,
-    starThresholds: [1200 + i * 1400, 3000 + i * 2200, 5500 + i * 3500],
+    moves: moves,
+    targetScore: targetScore,
+    starThresholds: [targetScore, Math.round(targetScore * 1.8), Math.round(targetScore * 2.8)],
     objectiveType: LevelObjectiveType.TARGET_SCORE,
     allowedFoods: [FoodType.PIZZA, FoodType.BURGER, FoodType.DONUT, FoodType.STRAWBERRY, FoodType.CAKE, FoodType.FRIES]
   });
