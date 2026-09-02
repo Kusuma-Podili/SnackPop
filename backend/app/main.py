@@ -22,6 +22,12 @@ from backend.app.api.v1.rewards import router as rewards_router
 from backend.app.api.v1.transactions import router as transactions_router
 from backend.app.api.v1.orders import router as orders_router
 from backend.app.api.v1.cooking import router as cooking_router
+from backend.app.api.v1.locations import router as locations_router
+from backend.app.api.v1.foods import router as foods_router
+from backend.app.api.v1.missions import router as missions_router
+from backend.app.api.v1.achievements import router as achievements_router
+from backend.app.api.v1.leaderboard import router as leaderboard_router
+from backend.app.api.v1.analytics import router as analytics_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -58,6 +64,12 @@ app.include_router(rewards_router, prefix=settings.API_V1_STR)
 app.include_router(transactions_router, prefix=settings.API_V1_STR)
 app.include_router(orders_router, prefix=settings.API_V1_STR)
 app.include_router(cooking_router, prefix=settings.API_V1_STR)
+app.include_router(locations_router, prefix=settings.API_V1_STR)
+app.include_router(foods_router, prefix=settings.API_V1_STR)
+app.include_router(missions_router, prefix=settings.API_V1_STR)
+app.include_router(achievements_router, prefix=settings.API_V1_STR)
+app.include_router(leaderboard_router, prefix=settings.API_V1_STR)
+app.include_router(analytics_router, prefix=settings.API_V1_STR)
 
 # Mount Frontend Static Assets
 frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend"))
