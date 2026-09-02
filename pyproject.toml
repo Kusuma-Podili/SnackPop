@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "SnackPop Match-3 Saga Production Backend and Game Engine"
 readme = "README.md"
 authors = [{ name = "Kusuma Podili", email = "podilikusuma15@gmail.com" }]
-license = { text = "MIT" }
+license = { text = "Proprietary" }
 requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.110.0",

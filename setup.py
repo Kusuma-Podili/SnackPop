@@ -6,6 +6,7 @@ setup(
     description="Candy Crush-Style Food Matching Game (SnackPop Saga) Backend and Simulation Suite",
     author="Kusuma Podili",
     author_email="podilikusuma15@gmail.com",
+    license="Proprietary",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[

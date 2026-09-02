@@ -1,7 +1,7 @@
 # 🍬🍕 SnackPop Saga — Production Match-3 & Food Merge Game
 
 [![FastAPI CI](https://github.com/Kusuma-Podili/SnackPop/actions/workflows/ci.yml/badge.svg)](https://github.com/Kusuma-Podili/SnackPop/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)]()
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![TypeScript 5.4+](https://img.shields.io/badge/typescript-5.4+-blue.svg)](https://www.typescriptlang.org/)
 [![Prod LOC](https://img.shields.io/badge/Prod%20LOC-56%2C000%2B-brightgreen.svg)]()

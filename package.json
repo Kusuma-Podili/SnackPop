@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Candy Crush-Style Food Matching Game (SnackPop Saga) with 50+ Levels, Procedural Web Audio Synth, 2D Particle Engine, and FastAPI Backend",
   "main": "frontend/js/bundle.js",
+  "private": true,
+  "license": "UNLICENSED",
   "scripts": {
     "start": "python run.py",
     "serve": "python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload",
@@ -20,7 +22,6 @@
     "canvas-particles"
   ],
   "author": "Kusuma Podili",
-  "license": "MIT",
   "dependencies": {
     "howler": "^2.2.4",
     "canvas-confetti": "^1.9.4"
