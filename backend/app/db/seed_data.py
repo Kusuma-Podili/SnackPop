@@ -517,16 +517,16 @@ def seed_database(db: Session):
 
     # Starter inventory stock for demo player
     starter_stocks = [
-        ("Burger Bun", 12),
-        ("Beef Patty", 10),
-        ("Cheddar Cheese", 10),
-        ("Lettuce", 12),
-        ("Tomato", 10),
-        ("Secret Burger Sauce", 8),
-        ("Potato", 15),
-        ("Frying Oil", 6),
-        ("Lemon", 10),
-        ("Sugar Syrup", 6),
+        ("Burger Bun", 4),
+        ("Beef Patty", 4),
+        ("Cheddar Cheese", 4),
+        ("Lettuce", 4),
+        ("Tomato", 4),
+        ("Secret Burger Sauce", 3),
+        ("Potato", 4),
+        ("Frying Oil", 2),
+        ("Lemon", 4),
+        ("Sugar Syrup", 2),
     ]
     for ing_name, qty in starter_stocks:
         ing_obj = ingredient_objs.get(ing_name)
