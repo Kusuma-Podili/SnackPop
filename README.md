@@ -1,142 +1,188 @@
-# 🚚 Food Truck Tycoon
+# 🍬🍕 SnackPop Saga - Candy Crush Food Matching Game 🍕🍬
 
-A production-grade, highly engaging, full-stack cooking and food-business simulation game. 
-
-Start from a humble food cart on City Street and grow into a global food truck mogul! Manage ingredient supply chains, master multi-station recipe preparation, serve dynamic customer archetypes within tight timers, upgrade your truck to Tier 5 Elite, unlock 6 vibrant city hotspots, complete daily missions, and compete on the global leaderboard.
+A production-grade, highly engaging, full-stack **Candy Crush-style Match-3 Game** built with modern web technologies, procedural Web Audio sound synthesis, particle physics, 50+ handcrafted multi-world levels, cloud save persistence, anti-cheat validation, and global leaderboards.
 
 ---
 
-## 🎮 Core Gameplay Loop
+## 🎮 Core Gameplay Mechanics
 
-```
-[ Buy Wholesale Stock ] ──► [ Receive Customer Orders ] ──► [ Sizzle & Cook (Sweet-Spot Timing) ]
-           ▲                                                                    │
-           │                                                                    ▼
-[ Upgrade Truck & Equipment ] ◄── [ Earn Coins + XP + Tips ] ◄── [ Serve & Earn Star Ratings ]
-           │
-           ▼
-[ Unlock 6 City Hotspots & Gourmet Recipes ] ──► [ Complete Missions & Top Global Leaderboard ]
-```
-
----
-
-## 🌟 Key Features
-
-### 1. 🍳 Precision Multi-Station Cooking Arena
-* **Station 1: Prep & Chopping**: Dynamic recipe ingredient validation against active truck inventory.
-* **Station 2: Live Sweet-Spot Timing Gauge**: Real-time interactive meter with needle movement. Hit the sweet spot for **PERFECT (⭐)**, **GOOD (👍)**, **LATE (⚠️)**, or avoid **BURNED (❌)**.
-* **Station 3: Plating & Assembly**: Plate multiple dishes on customer tickets.
-* **Station 4: Service Bell & Tipping**: Calculates satisfaction ratings, tips, XP bonuses, and reputation shifts.
-* **Procedural Sound Design**: Synthesized Web Audio API sound effects (sizzling pan, timer ticks, cash register chimes, level-up fanfares, error buzzers) with zero external broken assets.
-
-### 2. 👥 Dynamic Customer AI System
-* **5 Customer Archetypes**:
-  * `VIP`: High-rolling dignitaries who award up to 2.2x tips on PERFECT dishes but have fast patience drain.
-  * `FOOD_CRITIC`: Influential judges who boost or reduce reputation significantly based on cooking precision.
-  * `HUNGRY`: Multi-item orders (2-3 dishes) providing massive coin payouts.
-  * `IMPATIENT`: Fast-paced diners who demand quick service.
-  * `REGULAR`: Steady, balanced customers.
-
-### 3. 🚚 5-Tier Truck Progression & Visual Workshop
-* **Truck Tiers**:
-  * **Tier 1: Basic Cart** (50 Storage, 1.0x Speed, 3 Queue Cap)
-  * **Tier 2: Improved Truck** (80 Storage, 1.15x Speed, 4 Queue Cap)
-  * **Tier 3: Professional Rig** (120 Storage, 1.35x Speed, 5 Queue Cap)
-  * **Tier 4: Premium Cruiser** (180 Storage, 1.60x Speed, 6 Queue Cap)
-  * **Tier 5: Elite Tycoon Flagship** (250 Storage, 2.00x Speed, 8 Queue Cap)
-* **Kitchen Equipment Shop**: Upgrade Grills, Fryers, Commercial Fridges, and Stainless Prep Tables with real gameplay multiplier effects.
-* **Custom Customizer**: Dynamic SVG visualizer reflecting custom paint schemes, neon signage, decals, and wheel rims in real-time.
-
-### 4. 📦 Wholesale Inventory Marketplace
-* Real storage capacity limits, low-stock alerts, category filters, and quick bulk purchasing.
-* Automatic ingredient deductions upon cooking.
-
-### 5. 🗺️ 6 Playable City Hotspots
-1. **City Street** (Free, Level 1)
-2. **Beach Boardwalk** (800 Coins, Level 2)
-3. **University Campus** (2,000 Coins, Level 4)
-4. **Business District** (5,000 Coins, Level 6)
-5. **Festival Grounds** (10,000 Coins, Level 9)
-6. **Downtown Metropolis** (25,000 Coins, Level 13)
-
-### 6. 🏆 Progression, Missions & Leaderboard
-* 20+ Player Levels with recipe unlocks and coin rewards.
-* 7-Day Daily Login Streak calendar with compounding daily rewards.
-* Daily & Lifetime Missions with real-time tracking and claimable rewards.
-* 10+ Milestone Achievement Trophies.
-* Global Leaderboard ranked by Revenue, Reputation, Orders, or Level.
-* Business Intelligence Dashboard with P&L reporting, profit margins, and Chart.js analytics.
-
-### 7. 🛡️ Complete Admin Management Portal
-* Role-based access control (`PLAYER` vs `ADMIN`).
-* Platform-wide telemetry (Total revenue, active players, global order counts).
-* Player Account Manager (Inspect profiles, grant coins/XP, set level, ban/activate accounts).
-* Recipe Builder (Create new dishes with required ingredients and selling prices).
-* Game Balance & Economy Settings Editor.
+### 1. 🍕 Food Archetypes
+Match 3 or more identical foods in rows or columns:
+* 🍕 **Artisan Pizza**
+* 🍔 **Wagyu Burger**
+* 🍩 **Glazed Donut**
+* 🍓 **Alpine Strawberry**
+* 🍰 **Berry Layer Cake**
+* 🍟 **Crispy Belgian Fries**
+* 🌮 **Flame-Grilled Taco**
+* 🍣 **Salmon Nigiri Sushi**
 
 ---
 
-## 🔑 Default Credentials
+### 2. ⚡ Special Foods & Synthesis Combos
+* **4-in-a-Line** ──► **Striped Food (Horizontal / Vertical)**:
+  * Emits a piercing laser beam clearing an entire row or column.
+* **5 in T-Shape / L-Shape / Cross** ──► **Wrapped Sizzle Bomb**:
+  * Explodes a 3x3 surrounding zone twice with dynamic screen shake.
+* **5 in a Straight Line** ──► **Rainbow Chef Hat / Flavor Bomb**:
+  * Swapping with any food clears all tiles of that food type across the entire board!
 
-| Role | Username / Email | Password | Description |
-| :--- | :--- | :--- | :--- |
-| **Admin** | `admin` or `admin@foodtrucktycoon.com` | `AdminSecret2026!` | Full administrative portal access |
-| **Demo Player** | `chef_mario` or `mario@foodtrucktycoon.com` | `PlayerSecret123!` | Starter player with coins, truck & stock |
-
-*New players can also register freely on the landing page.*
-
----
-
-## 🛠️ Technology Stack
-
-* **Backend**: FastAPI (Python 3.10+), SQLAlchemy 2.0, Pydantic v2, SQLite, Pytest, JWT Authentication (`python-jose`, `bcrypt`).
-* **Frontend**: HTML5, Tailwind CSS, Web Audio API (procedural synthesis), Chart.js, Vanilla ES6 JavaScript (zero node build step required).
-* **Testing**: Comprehensive Pytest test suite covering 5 modules and 27+ automated assertions.
+#### 💥 Super-Special Combinations:
+1. **Striped + Striped** ──► Cross-board laser beam clearing 1 row and 1 column simultaneously.
+2. **Striped + Bomb** ──► Mega Blaster clearing 3 full rows and 3 full columns!
+3. **Rainbow Hat + Striped** ──► Converts all target foods on board into Striped Foods and detonates them all!
+4. **Rainbow Hat + Rainbow Hat** ──► Total Cosmic Board Wipeout!
 
 ---
 
-## 🚀 Quickstart Guide
+## 🗺️ 5 Culinary Worlds (50+ Handcrafted Levels)
 
-### 1. Install Dependencies
+1. **World 1: Morning Bakery** (Levels 1–10)
+   * Introductions to basic matches, strawberry and donut glazes, and score goals.
+2. **World 2: Fast Food Fiesta** (Levels 11–20)
+   * Striped food combos, fry oil glazes, and Golden Spatula drop missions.
+3. **World 3: Italian Piazza** (Levels 21–30)
+   * Melted mozzarella double frostings and encroaching chocolate mold blockers.
+4. **World 4: Sweet Tooth Kingdom** (Levels 31–40)
+   * Royal Chef Trophies, checkerboard hole obstacles, and multi-layer sugar glazes.
+5. **World 5: Gourmet Galaxy** (Levels 41–50)
+   * Master-level 8-food challenges and the Grand Master Finale (Level 50).
+
+---
+
+## 🛠️ Boosters & Power-Ups
+
+* 🥄 **Chef's Spatula**: Smashes any single tile or blocker without spending a move.
+* 🥖 **Rolling Pin**: Wipes out an entire designated horizontal row.
+* 🌪️ **Blender**: Shuffles the entire board layout.
+* ➕ **+5 Extra Moves**: Clutch move booster when running low.
+* 🌈 **Pre-Game Flavor Bomb**: Begin the level with a Rainbow Chef Hat placed on board.
+
+---
+
+## 🔊 Procedural Web Audio Synthesis & Visual Juice
+
+* **Zero Missing Assets**: All audio is synthesized via the Web Audio API in real-time.
+* **Harmonic Pentatonic Scale**: Consecutive cascade combo matches pitch up harmonically (C4 ➔ D4 ➔ E4 ➔ G4 ➔ A4 ➔ C5 ➔ C6).
+* **2D Canvas Particle Simulation**: Crumb bursts, sparkle star trails, shockwaves, and victory confetti.
+* **Screen Juice Engine**: Dynamic camera trauma, directional screen shake, and impact hit-stops.
+
+---
+
+## 🏆 Daily Rewards, Cookbook & Trophies
+
+* 🎡 **Lucky Chef Daily Spin Wheel**: Spin daily for free boosters, gold coins, and extra lives.
+* 📖 **Master Chef Cookbook**: Unlock 25+ gourmet recipes with permanent passive score buffs.
+* 🏆 **Culinary Achievements**: 20+ milestone trophies awarding kitchen gold.
+* ❤️ **5-Life Energy System**: 20-minute persistent recharge timer with instant coin refills.
+
+---
+
+## 🚀 Quick Start Guide
+
+### 1. Requirements
+* Python 3.10+
+* Modern Web Browser (Chrome, Firefox, Edge, Safari)
+
+### 2. Install Dependencies
 ```bash
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-### 2. Initialize Database & Seed Content
-```bash
-python -m backend.app.db.init_db
-```
-
-### 3. Start Game Server
+### 3. Run Backend & Launch Game
 ```bash
 python run.py
 ```
-Open **http://localhost:8000** in any modern web browser.
-
-Interactive Swagger API docs are available at **http://localhost:8000/docs**.
+Open your browser at `http://127.0.0.1:8000`.
 
 ---
 
-## 🧪 Running Automated Tests
+## 🧪 Automated Test Suite (24 Test Cases)
 
-Run the full automated test suite:
+Run the full pytest suite:
 ```bash
-python -m pytest tests/ -v
+pytest -v --tb=short
 ```
 
-### Test Suite Structure:
-1. `tests/test_auth.py`: User registration, profile initialization, duplicate rejection, login verification, RBAC tokens.
-2. `tests/test_inventory_economy.py`: Inventory market buying, storage capacity validation, truck tier upgrades, equipment multipliers, 7-day streak rewards.
-3. `tests/test_cooking_engine.py`: Dynamic order generation, inventory ingredient deduction, sweet-spot accuracy scoring, order service & tips.
-4. `tests/test_progression_missions.py`: Location unlocking & switching, recipe profit margins, daily mission completion, trophy unlocking, leaderboard & analytics.
-5. `tests/test_admin_management.py`: Global telemetry stats, player balance adjustments, recipe builder, game settings config, and 403 Forbidden player role enforcement.
+### Test Coverage:
+* `test_match_detection.py`: 3-match, 4-match line, 5-match line, and L/T/Cross pattern recognition.
+* `test_gravity_cascades.py`: Gravity falls, hole avoidance, refill math, and combo score progression.
+* `test_super_combos.py`: Super combo interaction matrices.
+* `test_level_objectives.py`: Target score, frosting clearance, and move limit rules.
+* `test_backend_api.py`: FastAPI REST routes, anti-cheat validation, and leaderboards.
 
 ---
 
-## 📦 Pull Requests Summary
+## 📐 Architecture
 
-* **PR 1**: `feat(core)` - Project architecture, SQLite schema, JWT auth, seed data, frontend shell & procedural sound engine.
-* **PR 2**: `feat(economy)` - Wholesale inventory marketplace, 5-tier truck upgrades, equipment workshop, and 7-day daily streak.
-* **PR 3**: `feat(cooking)` - Real-time multi-station cooking arena, dynamic customer AI, sweet-spot timing needle, and audio synthesis.
-* **PR 4**: `feat(progression)` - 6 dynamic city territories, recipe catalog with profit margins, missions, achievements, leaderboard, and P&L business analytics.
-* **PR 5**: `feat(admin)` - Full administrative management suite, player inspector, recipe builder, balance tuning, and complete 5-file automated test suite.
+```
+food-game/
+├── backend/
+│   └── app/
+│       ├── api/
+│       │   └── endpoints.py
+│       ├── models/
+│       │   └── schemas.py
+│       ├── services/
+│       │   ├── anti_cheat.py
+│       │   └── leaderboard_service.py
+│       └── main.py
+├── frontend/
+│   ├── css/
+│   │   └── styles.css
+│   ├── js/
+│   │   └── bundle.js
+│   ├── src/
+│   │   ├── assets/
+│   │   │   └── food_sprites.ts
+│   │   ├── audio/
+│   │   │   ├── music_generator.ts
+│   │   │   └── synth.ts
+│   │   ├── components/
+│   │   │   ├── achievements.ts
+│   │   │   ├── cookbook.ts
+│   │   │   ├── daily_spin_wheel.ts
+│   │   │   ├── game_screen.ts
+│   │   │   ├── modals.ts
+│   │   │   └── settings_modal.ts
+│   │   ├── engine/
+│   │   │   ├── board.ts
+│   │   │   ├── combo_resolver.ts
+│   │   │   ├── gravity.ts
+│   │   │   ├── match_detector.ts
+│   │   │   ├── move_validator.ts
+│   │   │   ├── score_calculator.ts
+│   │   │   ├── special_creators.ts
+│   │   │   └── types.ts
+│   │   ├── juice/
+│   │   │   ├── floating_text.ts
+│   │   │   ├── particle_emitter.ts
+│   │   │   ├── screen_shake.ts
+│   │   │   └── tile_animator.ts
+│   │   ├── levels/
+│   │   │   ├── level_definitions.ts
+│   │   │   ├── objective_manager.ts
+│   │   │   └── world_map.ts
+│   │   ├── systems/
+│   │   │   ├── booster_manager.ts
+│   │   │   ├── lives_system.ts
+│   │   │   └── save_system.ts
+│   │   └── main.ts
+│   └── index.html
+├── tests/
+│   ├── conftest.py
+│   ├── test_backend_api.py
+│   ├── test_gravity_cascades.py
+│   ├── test_level_objectives.py
+│   ├── test_match_detection.py
+│   └── test_super_combos.py
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── requirements.txt
+├── run.py
+└── README.md
+```
+
+---
+*Built with ❤️ for culinary puzzle enthusiasts everywhere.*
