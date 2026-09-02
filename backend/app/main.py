@@ -28,6 +28,7 @@ from backend.app.api.v1.missions import router as missions_router
 from backend.app.api.v1.achievements import router as achievements_router
 from backend.app.api.v1.leaderboard import router as leaderboard_router
 from backend.app.api.v1.analytics import router as analytics_router
+from backend.app.api.v1.admin import router as admin_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -70,6 +71,7 @@ app.include_router(missions_router, prefix=settings.API_V1_STR)
 app.include_router(achievements_router, prefix=settings.API_V1_STR)
 app.include_router(leaderboard_router, prefix=settings.API_V1_STR)
 app.include_router(analytics_router, prefix=settings.API_V1_STR)
+app.include_router(admin_router, prefix=settings.API_V1_STR)
 
 # Mount Frontend Static Assets
 frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend"))
