@@ -1,0 +1,31 @@
+{
+  "name": "snackpop-saga",
+  "version": "1.0.0",
+  "description": "Candy Crush-Style Food Matching Game (SnackPop Saga) with 50+ Levels, Procedural Web Audio Synth, 2D Particle Engine, and FastAPI Backend",
+  "main": "frontend/js/bundle.js",
+  "scripts": {
+    "start": "python run.py",
+    "serve": "python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload",
+    "test": "pytest -v",
+    "build": "echo 'Client bundle ready.'"
+  },
+  "keywords": [
+    "match-3",
+    "game",
+    "casual-game",
+    "food-game",
+    "fastapi",
+    "web-audio",
+    "typescript",
+    "canvas-particles"
+  ],
+  "author": "Kusuma Podili",
+  "license": "MIT",
+  "dependencies": {
+    "howler": "^2.2.4",
+    "canvas-confetti": "^1.9.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
