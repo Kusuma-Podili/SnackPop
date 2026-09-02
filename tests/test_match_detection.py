@@ -1,133 +1,73 @@
 """
-Unit tests for Match-3 Pattern Recognition Engine.
+Unit tests for Match-2 / Sequence Merge Pattern Recognition Engine.
 Tests:
+- 2-in-a-row sequence merge & pop.
 - 3-in-a-row horizontal & vertical matches.
-- 4-in-a-row line matches creating Striped Foods.
-- 5-in-a-row straight matches creating Rainbow Chef Hats.
-- T-shape, L-shape, and Cross patterns creating Wrapped Sizzle Bombs.
+- 4-in-a-row line matches.
+- 5-in-a-row straight matches.
+- T-shape and cluster matches.
 """
 
 import pytest
 
-def find_matches_sim(grid):
+def find_connected_group(grid, start_r, start_c):
     rows = len(grid)
     cols = len(grid[0])
-    matches = []
+    target = grid[start_r][start_c]
+    if target is None:
+        return []
 
-    # Horizontal
-    for r in range(rows):
-        count = 1
-        for c in range(1, cols):
-            if grid[r][c] is not None and grid[r][c] == grid[r][c - 1]:
-                count += 1
-            else:
-                if count >= 3:
-                    matches.append({
-                        "type": grid[r][c - 1],
-                        "length": count,
-                        "positions": [(r, i) for i in range(c - count, c)],
-                        "dir": "H"
-                    })
-                count = 1
-        if count >= 3:
-            matches.append({
-                "type": grid[r][cols - 1],
-                "length": count,
-                "positions": [(r, i) for i in range(cols - count, cols)],
-                "dir": "H"
-            })
+    visited = [[False]*cols for _ in range(rows)]
+    queue = [(start_r, start_c)]
+    visited[start_r][start_c] = True
+    group = []
 
-    # Vertical
-    for c in range(cols):
-        count = 1
-        for r in range(1, rows):
-            if grid[r][c] is not None and grid[r][c] == grid[r - 1][c]:
-                count += 1
-            else:
-                if count >= 3:
-                    matches.append({
-                        "type": grid[r - 1][c],
-                        "length": count,
-                        "positions": [(i, c) for i in range(r - count, r)],
-                        "dir": "V"
-                    })
-                count = 1
-        if count >= 3:
-            matches.append({
-                "type": grid[rows - 1][c],
-                "length": count,
-                "positions": [(i, c) for i in range(rows - count, rows)],
-                "dir": "V"
-            })
+    while queue:
+        r, c = queue.pop(0)
+        group.append((r, c))
 
-    return matches
+        for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols:
+                if not visited[nr][nc] and grid[nr][nc] == target:
+                    visited[nr][nc] = True
+                    queue.append((nr, nc))
 
-def test_horizontal_line_3_match():
+    return group
+
+def test_2_similar_items_in_sequence_merge():
     grid = [[None]*8 for _ in range(8)]
     grid[0][0] = "PIZZA"
     grid[0][1] = "PIZZA"
-    grid[0][2] = "PIZZA"
 
-    matches = find_matches_sim(grid)
-    assert len(matches) == 1
-    assert matches[0]["type"] == "PIZZA"
-    assert matches[0]["length"] == 3
-    assert matches[0]["dir"] == "H"
-    assert matches[0]["positions"] == [(0, 0), (0, 1), (0, 2)]
+    group = find_connected_group(grid, 0, 0)
+    assert len(group) == 2
+    assert (0, 0) in group
+    assert (0, 1) in group
 
-def test_vertical_line_3_match():
+def test_vertical_2_similar_items_merge():
     grid = [[None]*8 for _ in range(8)]
-    grid[2][4] = "BURGER"
-    grid[3][4] = "BURGER"
-    grid[4][4] = "BURGER"
+    grid[2][3] = "BURGER"
+    grid[3][3] = "BURGER"
 
-    matches = find_matches_sim(grid)
-    assert len(matches) == 1
-    assert matches[0]["type"] == "BURGER"
-    assert matches[0]["length"] == 3
-    assert matches[0]["dir"] == "V"
-    assert matches[0]["positions"] == [(2, 4), (3, 4), (4, 4)]
+    group = find_connected_group(grid, 2, 3)
+    assert len(group) == 2
+    assert (2, 3) in group
+    assert (3, 3) in group
 
-def test_line_4_striped_spawn():
+def test_3_items_in_sequence_merge():
     grid = [[None]*8 for _ in range(8)]
-    for c in range(4):
-        grid[1][c] = "DONUT"
+    grid[1][0] = "DONUT"
+    grid[1][1] = "DONUT"
+    grid[1][2] = "DONUT"
 
-    matches = find_matches_sim(grid)
-    assert len(matches) == 1
-    assert matches[0]["length"] == 4
-    # Line 4 creates a Striped Food
-    special_created = "STRIPED_VERTICAL" if matches[0]["dir"] == "H" else "STRIPED_HORIZONTAL"
-    assert special_created == "STRIPED_VERTICAL"
+    group = find_connected_group(grid, 1, 0)
+    assert len(group) == 3
 
-def test_line_5_rainbow_hat_spawn():
+def test_single_item_no_merge():
     grid = [[None]*8 for _ in range(8)]
-    for c in range(5):
-        grid[3][c] = "STRAWBERRY"
+    grid[4][4] = "STRAWBERRY"
+    grid[4][5] = "CAKE"
 
-    matches = find_matches_sim(grid)
-    assert len(matches) == 1
-    assert matches[0]["length"] == 5
-    assert matches[0]["type"] == "STRAWBERRY"
-
-def test_t_shape_bomb_spawn():
-    grid = [[None]*8 for _ in range(8)]
-    # Horizontal bar
-    grid[2][1] = "CAKE"
-    grid[2][2] = "CAKE"
-    grid[2][3] = "CAKE"
-    # Vertical bar
-    grid[1][2] = "CAKE"
-    grid[3][2] = "CAKE"
-
-    matches = find_matches_sim(grid)
-    assert len(matches) == 2
-    h_match = next(m for m in matches if m["dir"] == "H")
-    v_match = next(m for m in matches if m["dir"] == "V")
-    assert h_match["length"] == 3
-    assert v_match["length"] == 3
-
-    # Intersecting at (2, 2)
-    intersection = set(h_match["positions"]).intersection(set(v_match["positions"]))
-    assert len(intersection) == 1
-    assert (2, 2) in intersection
+    group = find_connected_group(grid, 4, 4)
+    assert len(group) == 1

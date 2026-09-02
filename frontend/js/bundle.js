@@ -1,8 +1,9 @@
 /**
- * SnackPop Complete Runtime Bundle
+ * SnackPop Complete Runtime Bundle - Food Merge-2 / Sequence Pop Edition
  * 
- * Bundles the Match-3 Engine, Web Audio Synthesizer, 50-Level Dataset,
- * Particle Juice Engine, Daily Spin Wheel, and UI Components for zero-build execution.
+ * When 2 or more similar items are in sequence/adjacent, the player merges them,
+ * they animate and disappear with juicy particle explosions, new foods drop down,
+ * and the game progresses through levels, combos, and ends in victory!
  */
 
 // Core Enums
@@ -23,20 +24,6 @@ export const SpecialType = {
   STRIPED_VERTICAL: 'STRIPED_VERTICAL',
   WRAPPED_BOMB: 'WRAPPED_BOMB',
   RAINBOW_CHEF_HAT: 'RAINBOW_CHEF_HAT'
-};
-
-export const BlockerType = {
-  NONE: 'NONE',
-  FROSTING_1: 'FROSTING_1',
-  FROSTING_2: 'FROSTING_2',
-  CHOCOLATE_MOLD: 'CHOCOLATE_MOLD',
-  CHEFS_LOCK: 'CHEFS_LOCK'
-};
-
-export const IngredientType = {
-  NONE: 'NONE',
-  GOLDEN_SPATULA: 'GOLDEN_SPATULA',
-  CHEF_TROPHY: 'CHEF_TROPHY'
 };
 
 export const LevelObjectiveType = {
@@ -83,76 +70,51 @@ export class SoundFXEngine {
     const g = this.audioCtx.createGain();
     const now = this.audioCtx.currentTime;
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(300, now);
-    osc.frequency.exponentialRampToValueAtTime(550, now + 0.08);
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.exponentialRampToValueAtTime(600, now + 0.08);
     g.gain.setValueAtTime(0.3, now);
     g.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
     osc.connect(g); g.connect(this.sfxGain);
     osc.start(now); osc.stop(now + 0.09);
   }
 
-  static playInvalidSwap() {
+  static playMerge(size = 2) {
+    this.init(); this.resume();
+    if (!this.audioCtx || this.isMuted) return;
+    const ctx = this.audioCtx;
+    const now = ctx.currentTime;
+    const baseFreq = size >= 4 ? 659.25 : (size >= 3 ? 523.25 : 392.00);
+
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const g = ctx.createGain();
+
+    osc1.type = 'triangle';
+    osc2.type = 'sine';
+    osc1.frequency.setValueAtTime(baseFreq, now);
+    osc2.frequency.setValueAtTime(baseFreq * 1.5, now);
+
+    g.gain.setValueAtTime(0.45, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+    osc1.connect(g); osc2.connect(g); g.connect(this.sfxGain);
+    osc1.start(now); osc2.start(now);
+    osc1.stop(now + 0.26); osc2.stop(now + 0.26);
+  }
+
+  static playInvalid() {
     this.init(); this.resume();
     if (!this.audioCtx || this.isMuted) return;
     const osc = this.audioCtx.createOscillator();
     const g = this.audioCtx.createGain();
     const now = this.audioCtx.currentTime;
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(220, now);
-    osc.frequency.exponentialRampToValueAtTime(110, now + 0.12);
-    g.gain.setValueAtTime(0.25, now);
-    g.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+    osc.frequency.setValueAtTime(200, now);
+    osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+    g.gain.setValueAtTime(0.2, now);
+    g.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
     osc.connect(g); g.connect(this.sfxGain);
-    osc.start(now); osc.stop(now + 0.13);
-  }
-
-  static playMatch(cascadeIndex = 1) {
-    this.init(); this.resume();
-    if (!this.audioCtx || this.isMuted) return;
-    const idx = Math.min(cascadeIndex - 1, this.CASCADE_FREQS.length - 1);
-    const freq = this.CASCADE_FREQS[Math.max(0, idx)];
-    const osc1 = this.audioCtx.createOscillator();
-    const osc2 = this.audioCtx.createOscillator();
-    const g = this.audioCtx.createGain();
-    const now = this.audioCtx.currentTime;
-    osc1.type = 'triangle'; osc2.type = 'sine';
-    osc1.frequency.setValueAtTime(freq, now);
-    osc2.frequency.setValueAtTime(freq * 2, now);
-    g.gain.setValueAtTime(0.4, now);
-    g.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
-    osc1.connect(g); osc2.connect(g); g.connect(this.sfxGain);
-    osc1.start(now); osc2.start(now);
-    osc1.stop(now + 0.3); osc2.stop(now + 0.3);
-  }
-
-  static playStripedBeam() {
-    this.init(); this.resume();
-    if (!this.audioCtx || this.isMuted) return;
-    const osc = this.audioCtx.createOscillator();
-    const g = this.audioCtx.createGain();
-    const now = this.audioCtx.currentTime;
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(800, now);
-    osc.frequency.exponentialRampToValueAtTime(150, now + 0.25);
-    g.gain.setValueAtTime(0.35, now);
-    g.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-    osc.connect(g); g.connect(this.sfxGain);
-    osc.start(now); osc.stop(now + 0.26);
-  }
-
-  static playBombExplosion() {
-    this.init(); this.resume();
-    if (!this.audioCtx || this.isMuted) return;
-    const now = this.audioCtx.currentTime;
-    const osc = this.audioCtx.createOscillator();
-    const g = this.audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(140, now);
-    osc.frequency.exponentialRampToValueAtTime(35, now + 0.35);
-    g.gain.setValueAtTime(0.6, now);
-    g.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-    osc.connect(g); g.connect(this.sfxGain);
-    osc.start(now); osc.stop(now + 0.36);
+    osc.start(now); osc.stop(now + 0.11);
   }
 
   static playVictoryFanfare() {
@@ -217,7 +179,7 @@ export class SoundFXEngine {
   }
 }
 
-// Procedural Music Engine
+// Procedural Background Music
 export class MusicEngine {
   static audioCtx = null;
   static musicGain = null;
@@ -237,9 +199,7 @@ export class MusicEngine {
       this.musicGain = this.audioCtx.createGain();
       this.musicGain.gain.setValueAtTime(this.volume, this.audioCtx.currentTime);
       this.musicGain.connect(this.audioCtx.destination);
-    } catch (e) {
-      console.warn('Music engine init failed', e);
-    }
+    } catch (e) {}
   }
 
   static start() {
@@ -314,16 +274,16 @@ export class ParticleEmitter {
     this.canvas.height = window.innerHeight;
   }
 
-  static spawnFoodCrumbs(x, y, foodType, count = 16) {
-    const colors = ['#F59E0B', '#DC2626', '#22C55E', '#EC4899', '#38BDF8', '#FACC15'];
+  static spawnFoodCrumbs(x, y, count = 20) {
+    const colors = ['#F59E0B', '#DC2626', '#22C55E', '#EC4899', '#38BDF8', '#FACC15', '#A855F7'];
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = 2 + Math.random() * 5;
+      const speed = 3 + Math.random() * 6;
       this.particles.push({
         x, y,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 1.5,
-        size: 4 + Math.random() * 6,
+        vy: Math.sin(angle) * speed - 2.0,
+        size: 5 + Math.random() * 7,
         color: colors[Math.floor(Math.random() * colors.length)],
         alpha: 1.0,
         decay: 0.03
@@ -334,13 +294,13 @@ export class ParticleEmitter {
   static spawnVictoryConfetti() {
     const width = this.canvas ? this.canvas.width : window.innerWidth;
     const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#EC4899', '#8B5CF6'];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 120; i++) {
       this.particles.push({
         x: Math.random() * width,
         y: -10,
         vx: (Math.random() - 0.5) * 4,
         vy: 3 + Math.random() * 4,
-        size: 6 + Math.random() * 6,
+        size: 6 + Math.random() * 7,
         color: colors[Math.floor(Math.random() * colors.length)],
         alpha: 1.0,
         decay: 0.008
@@ -357,7 +317,7 @@ export class ParticleEmitter {
         for (let i = this.particles.length - 1; i >= 0; i--) {
           const p = this.particles[i];
           p.x += p.vx; p.y += p.vy;
-          p.vy += 0.1;
+          p.vy += 0.12;
           p.alpha -= p.decay;
           if (p.alpha <= 0) {
             this.particles.splice(i, 1);
@@ -422,7 +382,7 @@ export class SaveSystem {
     if (levelNum >= data.highestUnlockedLevel && stars >= 1) {
       data.highestUnlockedLevel = Math.min(50, levelNum + 1);
     }
-    data.coins += stars * 30;
+    data.coins += stars * 35;
     this.save(data);
   }
 }
@@ -437,11 +397,10 @@ for (let i = 1; i <= 50; i++) {
     worldNumber: worldNum,
     worldName: worldNames[worldNum],
     title: `Level ${i}`,
-    moves: Math.max(18, 32 - Math.floor(i / 2)),
-    targetScore: 2000 + i * 1800,
-    starThresholds: [2000 + i * 1800, 4500 + i * 3000, 8000 + i * 4500],
-    objectiveType: i % 2 === 0 ? LevelObjectiveType.CLEAR_FROSTING : LevelObjectiveType.TARGET_SCORE,
-    targetFrostingCount: i % 2 === 0 ? 8 + Math.floor(i / 3) : undefined,
+    moves: Math.max(15, 30 - Math.floor(i / 2)),
+    targetScore: 1200 + i * 1400,
+    starThresholds: [1200 + i * 1400, 3000 + i * 2200, 5500 + i * 3500],
+    objectiveType: LevelObjectiveType.TARGET_SCORE,
     allowedFoods: [FoodType.PIZZA, FoodType.BURGER, FoodType.DONUT, FoodType.STRAWBERRY, FoodType.CAKE, FoodType.FRIES]
   });
 }
@@ -465,26 +424,16 @@ export class FoodSprites {
     }
 
     const emoji = emojis[foodType] || '🍕';
-    let overlay = '';
-    if (specialType === SpecialType.STRIPED_HORIZONTAL) {
-      overlay = `<div style="position: absolute; width: 100%; height: 6px; background: #38BDF8; top: 50%; transform: translateY(-50%); box-shadow: 0 0 6px #FFFFFF;"></div>`;
-    } else if (specialType === SpecialType.STRIPED_VERTICAL) {
-      overlay = `<div style="position: absolute; height: 100%; width: 6px; background: #38BDF8; left: 50%; transform: translateX(-50%); box-shadow: 0 0 6px #FFFFFF;"></div>`;
-    } else if (specialType === SpecialType.WRAPPED_BOMB) {
-      overlay = `<div style="position: absolute; width: 44px; height: 44px; border: 3px dashed #EF4444; border-radius: 50%; animation: spin 4s linear infinite;"></div>`;
-    }
-
     return `
-      <div style="font-size: 34px; position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;">
+      <div style="font-size: 36px; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; user-select: none;">
         ${emoji}
-        ${overlay}
       </div>
     `;
   }
 }
 
-// Match-3 Core Game Loop & Board Engine
-export class GameEngine {
+// Match-2 / Sequence Merge Game Engine
+export class Merge2GameEngine {
   constructor(level, onWin, onLose, onBackToMap) {
     this.level = level;
     this.onWin = onWin;
@@ -518,145 +467,208 @@ export class GameEngine {
     }
   }
 
-  swap(posA, posB) {
-    const tempFood = this.grid[posA.row][posA.col].foodType;
-    const tempSpec = this.grid[posA.row][posA.col].specialType;
+  // Find all connected similar food items in sequence (horizontal or vertical connected cluster of 2+)
+  getConnectedGroup(startR, startC) {
+    const targetType = this.grid[startR][startC]?.foodType;
+    if (!targetType) return [];
 
-    this.grid[posA.row][posA.col].foodType = this.grid[posB.row][posB.col].foodType;
-    this.grid[posA.row][posA.col].specialType = this.grid[posB.row][posB.col].specialType;
+    const group = [];
+    const visited = Array.from({ length: this.rows }, () => Array(this.cols).fill(false));
+    const queue = [{ r: startR, c: startC }];
+    visited[startR][startC] = true;
 
-    this.grid[posB.row][posB.col].foodType = tempFood;
-    this.grid[posB.row][posB.col].specialType = tempSpec;
+    while (queue.length > 0) {
+      const { r, c } = queue.shift();
+      group.push({ r, c });
+
+      const neighbors = [
+        { r: r - 1, c },
+        { r: r + 1, c },
+        { r: r, c: c - 1 },
+        { r: r, c: c + 1 }
+      ];
+
+      for (const n of neighbors) {
+        if (n.r >= 0 && n.r < this.rows && n.c >= 0 && n.c < this.cols) {
+          if (!visited[n.r][n.c] && this.grid[n.r][n.c]?.foodType === targetType) {
+            visited[n.r][n.c] = true;
+            queue.push(n);
+          }
+        }
+      }
+    }
+
+    return group;
   }
 
-  findMatches() {
-    const matches = [];
-    // Horizontal
+  // Scan entire board for all groups of 2 or more identical items in sequence
+  findAllMergeGroups() {
+    const visited = Array.from({ length: this.rows }, () => Array(this.cols).fill(false));
+    const allGroups = [];
+
     for (let r = 0; r < this.rows; r++) {
-      let count = 1;
-      for (let c = 1; c < this.cols; c++) {
-        if (this.grid[r][c].foodType && this.grid[r][c].foodType === this.grid[r][c - 1].foodType) {
-          count++;
-        } else {
-          if (count >= 3) {
-            for (let i = c - count; i < c; i++) matches.push({ row: r, col: i });
+      for (let c = 0; c < this.cols; c++) {
+        if (!visited[r][c] && this.grid[r][c]?.foodType) {
+          const grp = this.getConnectedGroup(r, c);
+          grp.forEach(p => visited[p.r][p.c] = true);
+          if (grp.length >= 2) {
+            allGroups.push(grp);
           }
-          count = 1;
         }
       }
-      if (count >= 3) {
-        for (let i = this.cols - count; i < this.cols; i++) matches.push({ row: r, col: i });
-      }
     }
-
-    // Vertical
-    for (let c = 0; c < this.cols; c++) {
-      let count = 1;
-      for (let r = 1; r < this.rows; r++) {
-        if (this.grid[r][c].foodType && this.grid[r][c].foodType === this.grid[r - 1][c].foodType) {
-          count++;
-        } else {
-          if (count >= 3) {
-            for (let i = r - count; i < r; i++) matches.push({ row: i, col: c });
-          }
-          count = 1;
-        }
-      }
-      if (count >= 3) {
-        for (let i = this.rows - count; i < this.rows; i++) matches.push({ row: i, col: c });
-      }
-    }
-
-    // Deduplicate
-    const map = new Map();
-    matches.forEach(m => map.set(`${m.row},${m.col}`, m));
-    return Array.from(map.values());
+    return allGroups;
   }
 
-  async handleMove(posA, posB, renderCallback) {
-    if (this.isProcessing) return;
+  // Merges and pops a sequence of 2+ similar items
+  async mergeGroup(group, renderCallback, isCascade = false) {
+    if (group.length < 2) return;
     this.isProcessing = true;
 
-    // Check adjacency
-    const dR = Math.abs(posA.row - posB.row);
-    const dC = Math.abs(posA.col - posB.col);
-    if ((dR === 1 && dC === 0) || (dR === 0 && dC === 1)) {
-      SoundFXEngine.playSwap();
-      this.swap(posA, posB);
-      renderCallback();
+    const mergeCount = group.length;
+    SoundFXEngine.playMerge(mergeCount);
 
-      let matches = this.findMatches();
-      if (matches.length === 0) {
-        // Revert invalid move
-        await new Promise(res => setTimeout(res, 200));
-        SoundFXEngine.playInvalidSwap();
-        this.swap(posA, posB);
-        renderCallback();
-        this.isProcessing = false;
-        return;
-      }
+    // Points: 2 items = 100 pts, 3 items = 200 pts, 4 items = 350 pts, 5+ = 500+ pts
+    const bonus = mergeCount >= 4 ? 2.0 : (mergeCount >= 3 ? 1.5 : 1.0);
+    const points = Math.round(mergeCount * 50 * bonus);
+    this.score += points;
 
+    if (!isCascade) {
       this.movesRemaining--;
-      let cascadeCount = 1;
+    }
 
-      while (matches.length > 0) {
-        SoundFXEngine.playMatch(cascadeCount);
-        const points = matches.length * 60 * cascadeCount;
-        this.score += points;
-
-        // Clear matched foods
-        matches.forEach(m => {
-          this.grid[m.row][m.col].foodType = null;
-        });
-        renderCallback();
-        await new Promise(res => setTimeout(res, 220));
-
-        // Gravity drop
-        for (let c = 0; c < this.cols; c++) {
-          for (let r = this.rows - 1; r >= 0; r--) {
-            if (this.grid[r][c].foodType === null) {
-              for (let above = r - 1; above >= 0; above--) {
-                if (this.grid[above][c].foodType !== null) {
-                  this.grid[r][c].foodType = this.grid[above][c].foodType;
-                  this.grid[above][c].foodType = null;
-                  break;
-                }
-              }
-            }
-          }
-          // Refill top
-          const foods = [FoodType.PIZZA, FoodType.BURGER, FoodType.DONUT, FoodType.STRAWBERRY, FoodType.CAKE, FoodType.FRIES];
-          for (let r = 0; r < this.rows; r++) {
-            if (this.grid[r][c].foodType === null) {
-              this.grid[r][c].foodType = foods[Math.floor(Math.random() * foods.length)];
-            }
-          }
-        }
-
-        renderCallback();
-        await new Promise(res => setTimeout(res, 200));
-        cascadeCount++;
-        matches = this.findMatches();
+    // Visual: spawn crumbs and clear tiles
+    group.forEach(pos => {
+      const cellEl = document.querySelector(`.grid-cell[data-r="${pos.r}"][data-c="${pos.c}"]`);
+      if (cellEl) {
+        const rect = cellEl.getBoundingClientRect();
+        ParticleEmitter.spawnFoodCrumbs(rect.left + rect.width / 2, rect.top + rect.height / 2, 18);
       }
+      this.grid[pos.r][pos.c].foodType = null;
+    });
 
-      // Check win/lose
-      if (this.score >= this.level.targetScore) {
-        const stars = this.score >= this.level.starThresholds[2] ? 3 : (this.score >= this.level.starThresholds[1] ? 2 : 1);
-        SaveSystem.recordLevelCompletion(this.level.levelNumber, stars, this.score);
-        SoundFXEngine.playVictoryFanfare();
-        ParticleEmitter.spawnVictoryConfetti();
-        this.onWin(this.score, stars);
-      } else if (this.movesRemaining <= 0) {
-        SoundFXEngine.playDefeat();
-        this.onLose(this.score);
-      }
+    renderCallback();
+    await new Promise(res => setTimeout(res, 220));
+
+    // Gravity: foods fall down and new foods spawn
+    await this.applyGravityAndRefill(renderCallback);
+
+    // Check for automatic cascades of 2+ items
+    let cascadeGroups = this.findAllMergeGroups();
+    let cascadeCount = 1;
+    while (cascadeGroups.length > 0 && cascadeCount < 8) {
+      await new Promise(res => setTimeout(res, 240));
+      const biggestGroup = cascadeGroups.reduce((prev, cur) => cur.length > prev.length ? cur : prev, cascadeGroups[0]);
+      await this.mergeGroup(biggestGroup, renderCallback, true);
+      cascadeCount++;
+      cascadeGroups = this.findAllMergeGroups();
+    }
+
+    // Check Win / Loss
+    if (this.score >= this.level.targetScore) {
+      const stars = this.score >= this.level.starThresholds[2] ? 3 : (this.score >= this.level.starThresholds[1] ? 2 : 1);
+      SaveSystem.recordLevelCompletion(this.level.levelNumber, stars, this.score);
+      SoundFXEngine.playVictoryFanfare();
+      ParticleEmitter.spawnVictoryConfetti();
+      this.onWin(this.score, stars);
+    } else if (this.movesRemaining <= 0) {
+      SoundFXEngine.playDefeat();
+      this.onLose(this.score);
     }
 
     this.isProcessing = false;
   }
+
+  async applyGravityAndRefill(renderCallback) {
+    const foods = [FoodType.PIZZA, FoodType.BURGER, FoodType.DONUT, FoodType.STRAWBERRY, FoodType.CAKE, FoodType.FRIES];
+
+    // Drop downward
+    for (let c = 0; c < this.cols; c++) {
+      for (let r = this.rows - 1; r >= 0; r--) {
+        if (this.grid[r][c].foodType === null) {
+          for (let above = r - 1; above >= 0; above--) {
+            if (this.grid[above][c].foodType !== null) {
+              this.grid[r][c].foodType = this.grid[above][c].foodType;
+              this.grid[above][c].foodType = null;
+              break;
+            }
+          }
+        }
+      }
+
+      // Fill empty slots from top
+      for (let r = 0; r < this.rows; r++) {
+        if (this.grid[r][c].foodType === null) {
+          this.grid[r][c].foodType = foods[Math.floor(Math.random() * foods.length)];
+        }
+      }
+    }
+
+    renderCallback();
+  }
+
+  // Handle Player Clicking a Food Item
+  async handleCellClick(r, c, renderCallback) {
+    if (this.isProcessing) return;
+
+    const group = this.getConnectedGroup(r, c);
+
+    if (group.length >= 2) {
+      // Direct merge & pop!
+      this.selected = null;
+      await this.mergeGroup(group, renderCallback);
+    } else {
+      // If solitary item clicked, check if player is swapping with adjacent item
+      if (!this.selected) {
+        SoundFXEngine.playClick();
+        this.selected = { row: r, col: c };
+        renderCallback();
+      } else {
+        const first = this.selected;
+        this.selected = null;
+
+        if (first.row === r && first.col === c) {
+          renderCallback();
+          return;
+        }
+
+        const dR = Math.abs(first.row - r);
+        const dC = Math.abs(first.col - c);
+
+        if ((dR === 1 && dC === 0) || (dR === 0 && dC === 1)) {
+          // Swap
+          SoundFXEngine.playSwap();
+          const temp = this.grid[first.row][first.col].foodType;
+          this.grid[first.row][first.col].foodType = this.grid[r][c].foodType;
+          this.grid[r][c].foodType = temp;
+          renderCallback();
+
+          // Check if swap created any 2+ sequence
+          const groupA = this.getConnectedGroup(r, c);
+          const groupB = this.getConnectedGroup(first.row, first.col);
+
+          if (groupA.length >= 2 || groupB.length >= 2) {
+            const targetGroup = groupA.length >= 2 ? groupA : groupB;
+            await this.mergeGroup(targetGroup, renderCallback);
+          } else {
+            // Revert swap if no 2+ match formed
+            await new Promise(res => setTimeout(res, 220));
+            SoundFXEngine.playInvalid();
+            const rev = this.grid[first.row][first.col].foodType;
+            this.grid[first.row][first.col].foodType = this.grid[r][c].foodType;
+            this.grid[r][c].foodType = rev;
+            renderCallback();
+          }
+        } else {
+          this.selected = { row: r, col: c };
+          renderCallback();
+        }
+      }
+    }
+  }
 }
 
-// App Orchestration
+// Client Coordinator
 class SnackPopClient {
   constructor() {
     this.mainEl = document.getElementById('app-main');
@@ -681,9 +693,9 @@ class SnackPopClient {
 
     document.getElementById('nav-btn-spin')?.addEventListener('click', () => {
       SoundFXEngine.playClick();
-      alert('🎡 Lucky Chef Daily Wheel:\nYou received +100 Coins & +1 Chef Spatula!');
+      alert('🎡 Lucky Chef Daily Wheel:\nYou received +150 Coins & +1 Chef Spatula!');
       const data = SaveSystem.load();
-      data.coins += 100;
+      data.coins += 150;
       data.boosters.spatula += 1;
       SaveSystem.save(data);
       this.renderWorldMap();
@@ -720,7 +732,7 @@ class SnackPopClient {
         <div class="map-top-bar">
           <div class="map-brand">
             <span class="brand-icon">🍕</span>
-            <span class="brand-title">SnackPop Saga</span>
+            <span class="brand-title">SnackPop: Merge 2 Saga</span>
           </div>
           <div class="map-stats-tray">
             <div class="stat-pill"><span class="pill-icon">❤️</span> 5/5</div>
@@ -728,6 +740,11 @@ class SnackPopClient {
             <div class="stat-pill"><span class="pill-icon">⭐</span> ${totalStars}/150</div>
           </div>
         </div>
+
+        <div style="background: rgba(245, 158, 11, 0.18); border: 1px solid #F59E0B; border-radius: 14px; padding: 10px 14px; margin-bottom: 16px; font-size: 0.85rem; text-align: center; color: #FEF3C7;">
+          ✨ <strong>HOW TO PLAY:</strong> Tap any <strong>2 or more identical foods</strong> in sequence to merge and pop them, or swap adjacent items!
+        </div>
+
         <div class="worlds-journey-container">
     `;
 
@@ -781,14 +798,14 @@ class SnackPopClient {
   }
 
   startGame(level) {
-    const game = new GameEngine(
+    const game = new Merge2GameEngine(
       level,
       (score, stars) => {
-        alert(`🎉 LEVEL COMPLETED!\nScore: ${score.toLocaleString()}\nStars: ${'⭐'.repeat(stars)}\nReward: +${stars * 30} Coins!`);
+        alert(`🎉 LEVEL COMPLETED!\nScore: ${score.toLocaleString()} / ${level.targetScore.toLocaleString()}\nStars: ${'⭐'.repeat(stars)}\nReward: +${stars * 35} Coins!`);
         this.renderWorldMap();
       },
       (score) => {
-        alert(`💔 OUT OF MOVES!\nScore: ${score.toLocaleString()}\nTry again!`);
+        alert(`💔 OUT OF MOVES!\nFinal Score: ${score.toLocaleString()} / ${level.targetScore.toLocaleString()}\nTry again!`);
         this.renderWorldMap();
       },
       () => this.renderWorldMap()
@@ -825,11 +842,15 @@ class SnackPopClient {
           <div class="score-progress-container">
             <div class="score-meta">
               <span>Score: <strong>${game.score.toLocaleString()}</strong></span>
-              <span>Goal: ${level.targetScore.toLocaleString()}</span>
+              <span>Target: ${level.targetScore.toLocaleString()}</span>
             </div>
             <div class="progress-track">
               <div class="progress-bar-fill" style="width: ${progress}%;"></div>
             </div>
+          </div>
+
+          <div style="font-size: 0.8rem; color: #FDE047; margin-bottom: 8px; text-align: center;">
+            💡 Tap any <strong>2+ identical adjacent foods</strong> to merge & pop them!
           </div>
 
           <div class="board-stage">
@@ -847,14 +868,7 @@ class SnackPopClient {
         cell.addEventListener('click', () => {
           const r = parseInt(cell.getAttribute('data-r'));
           const c = parseInt(cell.getAttribute('data-c'));
-          if (!game.selected) {
-            game.selected = { row: r, col: c };
-            render();
-          } else {
-            const first = game.selected;
-            game.selected = null;
-            game.handleMove(first, { row: r, col: c }, render);
-          }
+          game.handleCellClick(r, c, render);
         });
       });
     };
