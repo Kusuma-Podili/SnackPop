@@ -1,9 +1,8 @@
 /**
- * SnackPop Complete Runtime Bundle - Master Match-3 / Merge-3 Edition
+ * SnackPop Complete Runtime Bundle - Human-Crafted Vector Edition
  * 
- * Players swap adjacent food items or tap groups of 3 or more identical items (🍕🍔🍩🍓🍰🍟)
- * to merge and pop them. Matched items disappear with juice animations, new foods fall into place,
- * and the game waits for player interactions across 50 progressive levels.
+ * Crisp hand-crafted food vector illustrations (🍕🍔🍩🍓🍰🍟), clean modern white UI theme,
+ * player-controlled Match-3/Merge-3 swap mechanics, Web Audio synthesizer, and 50 levels.
  */
 
 // Core Enums
@@ -32,7 +31,184 @@ export const LevelObjectiveType = {
   COLLECT_INGREDIENTS: 'COLLECT_INGREDIENTS'
 };
 
-// Procedural Web Audio Synthesizer
+// Hand-Crafted Humanized Vector SVGs
+export class FoodSprites {
+  static getFoodSvg(foodType, specialType = SpecialType.NONE) {
+    let svgBody = '';
+
+    switch (foodType) {
+      case FoodType.PIZZA:
+        svgBody = `
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="crustGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#F59E0B" />
+                <stop offset="100%" stop-color="#D97706" />
+              </linearGradient>
+              <linearGradient id="cheeseGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#FDE047" />
+                <stop offset="100%" stop-color="#FACC15" />
+              </linearGradient>
+            </defs>
+            <!-- Crust -->
+            <path d="M 12 20 Q 50 8 88 20 L 50 90 Z" fill="url(#crustGrad)" stroke="#B45309" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- Cheese Layer -->
+            <path d="M 17 24 Q 50 14 83 24 L 50 84 Z" fill="url(#cheeseGrad)"/>
+            <!-- Pepperonis -->
+            <circle cx="38" cy="38" r="7.5" fill="#EF4444" stroke="#DC2626" stroke-width="1.5"/>
+            <circle cx="62" cy="42" r="7" fill="#EF4444" stroke="#DC2626" stroke-width="1.5"/>
+            <circle cx="49" cy="62" r="6.5" fill="#EF4444" stroke="#DC2626" stroke-width="1.5"/>
+            <!-- Basil Herbs -->
+            <path d="M 32 50 Q 36 45 40 50 Q 36 55 32 50 Z" fill="#16A34A"/>
+            <path d="M 59 30 Q 63 25 67 30 Q 63 35 59 30 Z" fill="#16A34A"/>
+          </svg>
+        `;
+        break;
+
+      case FoodType.BURGER:
+        svgBody = `
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bunGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#FBBF24" />
+                <stop offset="100%" stop-color="#D97706" />
+              </linearGradient>
+            </defs>
+            <!-- Top Bun -->
+            <path d="M 16 42 Q 50 12 84 42 Z" fill="url(#bunGrad)" stroke="#B45309" stroke-width="2.5"/>
+            <!-- Sesame Seeds -->
+            <ellipse cx="36" cy="28" rx="2.5" ry="1.2" fill="#FEF3C7" transform="rotate(-15 36 28)"/>
+            <ellipse cx="50" cy="22" rx="2.5" ry="1.2" fill="#FEF3C7"/>
+            <ellipse cx="64" cy="28" rx="2.5" ry="1.2" fill="#FEF3C7" transform="rotate(15 64 28)"/>
+            <!-- Lettuce Layer -->
+            <path d="M 12 43 Q 25 38 38 44 Q 50 38 62 44 Q 75 38 88 43 L 86 50 Q 50 48 14 50 Z" fill="#22C55E"/>
+            <!-- Tomato Slice -->
+            <rect x="18" y="49" width="64" height="7" rx="3.5" fill="#EF4444"/>
+            <!-- Cheddar Cheese -->
+            <path d="M 16 55 L 84 55 L 75 63 L 50 57 L 25 63 Z" fill="#FACC15"/>
+            <!-- Beef Patty -->
+            <rect x="15" y="59" width="70" height="13" rx="5" fill="#78350F" stroke="#451A03" stroke-width="2"/>
+            <!-- Bottom Bun -->
+            <path d="M 18 71 Q 50 73 82 71 L 80 83 Q 50 90 20 83 Z" fill="url(#bunGrad)" stroke="#B45309" stroke-width="2.5"/>
+          </svg>
+        `;
+        break;
+
+      case FoodType.DONUT:
+        svgBody = `
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="doughGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#FDE68A" />
+                <stop offset="100%" stop-color="#F59E0B" />
+              </linearGradient>
+            </defs>
+            <!-- Dough Ring -->
+            <circle cx="50" cy="50" r="38" fill="url(#doughGrad)" stroke="#D97706" stroke-width="2.5"/>
+            <!-- Strawberry Icing -->
+            <path d="M 50 14 C 70 14 86 28 86 50 C 86 64 78 70 74 65 C 70 60 62 68 56 62 C 50 56 42 66 36 60 C 30 54 24 62 20 54 C 14 46 14 36 22 24 C 28 14 38 14 50 14 Z" fill="#EC4899"/>
+            <!-- Donut Hole -->
+            <circle cx="50" cy="50" r="14" fill="#F8FAFC" stroke="#D97706" stroke-width="2"/>
+            <!-- Sprinkles -->
+            <rect x="32" y="24" width="7" height="3.5" rx="1.7" fill="#38BDF8" transform="rotate(25 32 24)"/>
+            <rect x="64" y="28" width="7" height="3.5" rx="1.7" fill="#FACC15" transform="rotate(-30 64 28)"/>
+            <rect x="42" y="32" width="7" height="3.5" rx="1.7" fill="#4ADE80" transform="rotate(70 42 32)"/>
+            <rect x="70" y="48" width="7" height="3.5" rx="1.7" fill="#A855F7" transform="rotate(10 70 48)"/>
+            <rect x="26" y="44" width="7" height="3.5" rx="1.7" fill="#FACC15" transform="rotate(-45 26 44)"/>
+          </svg>
+        `;
+        break;
+
+      case FoodType.STRAWBERRY:
+        svgBody = `
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="berryGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#F43F5E" />
+                <stop offset="100%" stop-color="#BE123C" />
+              </linearGradient>
+            </defs>
+            <!-- Berry Body -->
+            <path d="M 50 88 C 20 66 16 35 32 24 C 42 18 58 18 68 24 C 84 35 80 66 50 88 Z" fill="url(#berryGrad)" stroke="#9F1239" stroke-width="2.5"/>
+            <!-- Yellow Seeds -->
+            <circle cx="36" cy="38" r="2" fill="#FEF08A"/>
+            <circle cx="50" cy="34" r="2" fill="#FEF08A"/>
+            <circle cx="64" cy="38" r="2" fill="#FEF08A"/>
+            <circle cx="42" cy="50" r="2" fill="#FEF08A"/>
+            <circle cx="58" cy="50" r="2" fill="#FEF08A"/>
+            <circle cx="50" cy="65" r="2" fill="#FEF08A"/>
+            <circle cx="36" cy="62" r="2" fill="#FEF08A"/>
+            <circle cx="64" cy="62" r="2" fill="#FEF08A"/>
+            <!-- Green Leaves -->
+            <path d="M 50 14 C 48 22 38 26 30 24 C 38 28 42 34 44 38 C 46 30 54 30 56 38 C 58 34 62 28 70 24 C 62 26 52 22 50 14 Z" fill="#16A34A" stroke="#14532D" stroke-width="2"/>
+          </svg>
+        `;
+        break;
+
+      case FoodType.CAKE:
+        svgBody = `
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="cakeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#FB7185" />
+                <stop offset="100%" stop-color="#E11D48" />
+              </linearGradient>
+            </defs>
+            <!-- Cake Body -->
+            <path d="M 15 65 L 75 82 L 85 45 L 25 28 Z" fill="url(#cakeGrad)" stroke="#BE123C" stroke-width="2.5"/>
+            <!-- Cream Layers -->
+            <path d="M 18 55 L 77 72" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+            <path d="M 22 42 L 81 59" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+            <!-- Top Frosting -->
+            <path d="M 25 28 L 85 45 L 65 24 L 15 20 Z" fill="#FFF1F2" stroke="#E2E8F0" stroke-width="1.5"/>
+            <!-- Cherry on Top -->
+            <circle cx="45" cy="18" r="7.5" fill="#E11D48" stroke="#9F1239" stroke-width="1.5"/>
+            <path d="M 45 12 Q 52 4 58 6" stroke="#16A34A" stroke-width="2.5" fill="none"/>
+          </svg>
+        `;
+        break;
+
+      case FoodType.FRIES:
+        svgBody = `
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- Golden Fries Sticks -->
+            <rect x="28" y="16" width="7.5" height="34" rx="2" fill="#FBBF24" stroke="#D97706" stroke-width="1.5" transform="rotate(-10 28 16)"/>
+            <rect x="38" y="12" width="7.5" height="38" rx="2" fill="#FACC15" stroke="#D97706" stroke-width="1.5" transform="rotate(-3 38 12)"/>
+            <rect x="48" y="10" width="7.5" height="40" rx="2" fill="#FBBF24" stroke="#D97706" stroke-width="1.5" transform="rotate(4 48 10)"/>
+            <rect x="58" y="14" width="7.5" height="36" rx="2" fill="#FACC15" stroke="#D97706" stroke-width="1.5" transform="rotate(12 58 14)"/>
+            <rect x="66" y="20" width="7.5" height="30" rx="2" fill="#FBBF24" stroke="#D97706" stroke-width="1.5" transform="rotate(20 66 20)"/>
+            <!-- Red Carton -->
+            <path d="M 24 45 L 76 45 L 70 88 L 30 88 Z" fill="#EF4444" stroke="#B91C1C" stroke-width="2.5"/>
+            <path d="M 24 45 Q 50 55 76 45" fill="#DC2626"/>
+            <!-- Golden Logo Arc -->
+            <circle cx="50" cy="68" r="9" fill="#FDE047"/>
+            <text x="50" y="73" font-size="12" font-weight="900" fill="#DC2626" text-anchor="middle" font-family="Arial, sans-serif">M</text>
+          </svg>
+        `;
+        break;
+
+      default:
+        svgBody = `<circle cx="50" cy="50" r="30" fill="#F59E0B"/>`;
+        break;
+    }
+
+    let overlay = '';
+    if (specialType === SpecialType.STRIPED_HORIZONTAL) {
+      overlay = `<div style="position: absolute; width: 100%; height: 5px; background: #38BDF8; top: 50%; transform: translateY(-50%); box-shadow: 0 0 6px #FFFFFF; border-radius: 2px;"></div>`;
+    } else if (specialType === SpecialType.STRIPED_VERTICAL) {
+      overlay = `<div style="position: absolute; height: 100%; width: 5px; background: #38BDF8; left: 50%; transform: translateX(-50%); box-shadow: 0 0 6px #FFFFFF; border-radius: 2px;"></div>`;
+    }
+
+    return `
+      <div class="food-svg-wrap" style="position: relative;">
+        ${svgBody}
+        ${overlay}
+      </div>
+    `;
+  }
+}
+
+// Procedural Audio Engine
 export class SoundFXEngine {
   static audioCtx = null;
   static masterGain = null;
@@ -52,9 +228,7 @@ export class SoundFXEngine {
       this.sfxGain = this.audioCtx.createGain();
       this.sfxGain.connect(this.masterGain);
       this.masterGain.connect(this.audioCtx.destination);
-    } catch (e) {
-      console.warn('Web Audio not supported', e);
-    }
+    } catch (e) {}
   }
 
   static resume() {
@@ -269,16 +443,16 @@ export class ParticleEmitter {
     this.canvas.height = window.innerHeight;
   }
 
-  static spawnFoodCrumbs(x, y, count = 20) {
-    const colors = ['#F59E0B', '#DC2626', '#22C55E', '#EC4899', '#38BDF8', '#FACC15', '#A855F7'];
+  static spawnFoodCrumbs(x, y, count = 18) {
+    const colors = ['#F59E0B', '#DC2626', '#22C55E', '#EC4899', '#38BDF8', '#FACC15'];
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = 3 + Math.random() * 6;
+      const speed = 2.5 + Math.random() * 5.5;
       this.particles.push({
         x, y,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed - 2.0,
-        size: 5 + Math.random() * 7,
+        size: 4 + Math.random() * 6,
         color: colors[Math.floor(Math.random() * colors.length)],
         alpha: 1.0,
         decay: 0.03
@@ -289,13 +463,13 @@ export class ParticleEmitter {
   static spawnVictoryConfetti() {
     const width = this.canvas ? this.canvas.width : window.innerWidth;
     const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#EC4899', '#8B5CF6'];
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 100; i++) {
       this.particles.push({
         x: Math.random() * width,
         y: -10,
         vx: (Math.random() - 0.5) * 4,
         vy: 3 + Math.random() * 4,
-        size: 6 + Math.random() * 7,
+        size: 6 + Math.random() * 6,
         color: colors[Math.floor(Math.random() * colors.length)],
         alpha: 1.0,
         decay: 0.008
@@ -382,7 +556,7 @@ export class SaveSystem {
   }
 }
 
-// 50 Handcrafted Levels
+// 50 Levels Configuration
 export const ALL_LEVELS = [];
 for (let i = 1; i <= 50; i++) {
   const worldNum = Math.ceil(i / 10);
@@ -393,41 +567,14 @@ for (let i = 1; i <= 50; i++) {
     worldName: worldNames[worldNum],
     title: `Level ${i}`,
     moves: Math.max(15, 30 - Math.floor(i / 2)),
-    targetScore: 1500 + i * 1500,
-    starThresholds: [1500 + i * 1500, 3500 + i * 2500, 6500 + i * 4000],
+    targetScore: 1200 + i * 1400,
+    starThresholds: [1200 + i * 1400, 3000 + i * 2200, 5500 + i * 3500],
     objectiveType: LevelObjectiveType.TARGET_SCORE,
     allowedFoods: [FoodType.PIZZA, FoodType.BURGER, FoodType.DONUT, FoodType.STRAWBERRY, FoodType.CAKE, FoodType.FRIES]
   });
 }
 
-// Food Vector Sprites
-export class FoodSprites {
-  static getFoodSvg(foodType, specialType = SpecialType.NONE) {
-    const emojis = {
-      PIZZA: '🍕',
-      BURGER: '🍔',
-      DONUT: '🍩',
-      STRAWBERRY: '🍓',
-      CAKE: '🍰',
-      FRIES: '🍟',
-      TACO: '🌮',
-      SUSHI: '🍣'
-    };
-
-    if (specialType === SpecialType.RAINBOW_CHEF_HAT) {
-      return `<div style="font-size: 38px; filter: drop-shadow(0 0 8px #F43F5E); animation: pulseGlow 1s infinite alternate;">🌈</div>`;
-    }
-
-    const emoji = emojis[foodType] || '🍕';
-    return `
-      <div style="font-size: 36px; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; user-select: none;">
-        ${emoji}
-      </div>
-    `;
-  }
-}
-
-// Player-Controlled Match-3 / Merge-3 Game Engine
+// Match-3 Core Game Loop & Board Engine
 export class Match3GameEngine {
   constructor(level, onWin, onLose, onBackToMap) {
     this.level = level;
@@ -445,7 +592,7 @@ export class Match3GameEngine {
     this.initBoardWithoutMatches();
   }
 
-  // Generate an 8x8 board with NO initial 3-in-a-row matches
+  // Populate board preventing immediate 3-in-a-row matches on start
   initBoardWithoutMatches() {
     const foods = [FoodType.PIZZA, FoodType.BURGER, FoodType.DONUT, FoodType.STRAWBERRY, FoodType.CAKE, FoodType.FRIES];
     this.grid = [];
@@ -481,7 +628,6 @@ export class Match3GameEngine {
     }
   }
 
-  // Scan grid for horizontal and vertical lines of 3 or more identical foods
   findLineMatches() {
     const matches = [];
 
@@ -527,7 +673,6 @@ export class Match3GameEngine {
     return Array.from(map.values());
   }
 
-  // Find all connected identical foods starting at (r, c)
   getConnectedGroup(startR, startC) {
     const targetType = this.grid[startR][startC]?.foodType;
     if (!targetType) return [];
@@ -561,7 +706,6 @@ export class Match3GameEngine {
     return group;
   }
 
-  // Executes player swap between adjacent tiles
   async handleSwap(posA, posB, renderCallback) {
     if (this.isProcessing) return;
     this.isProcessing = true;
@@ -574,11 +718,11 @@ export class Match3GameEngine {
     this.grid[posB.row][posB.col].foodType = temp;
     renderCallback();
 
-    // Check for 3+ matches formed by swap
+    // Check matches
     const matches = this.findLineMatches();
 
     if (matches.length === 0) {
-      // Revert swap if no match of 3+ formed
+      // Revert invalid swap
       await new Promise(res => setTimeout(res, 220));
       SoundFXEngine.playInvalid();
       const rev = this.grid[posA.row][posA.col].foodType;
@@ -589,13 +733,11 @@ export class Match3GameEngine {
       return;
     }
 
-    // Valid Player Match!
     this.movesRemaining--;
     await this.resolveMatchesAndCascades(matches, renderCallback);
     this.isProcessing = false;
   }
 
-  // Player directly merges 3+ connected items
   async handleGroupMerge(group, renderCallback) {
     if (this.isProcessing || group.length < 3) return;
     this.isProcessing = true;
@@ -605,7 +747,6 @@ export class Match3GameEngine {
     this.isProcessing = false;
   }
 
-  // Resolves match, triggers particles, drops foods, and checks natural falling cascades
   async resolveMatchesAndCascades(initialMatches, renderCallback) {
     let currentMatches = initialMatches;
     let cascadeIndex = 1;
@@ -628,7 +769,7 @@ export class Match3GameEngine {
       renderCallback();
       await new Promise(res => setTimeout(res, 220));
 
-      // Gravity: Drop downward
+      // Gravity drop
       const foods = [FoodType.PIZZA, FoodType.BURGER, FoodType.DONUT, FoodType.STRAWBERRY, FoodType.CAKE, FoodType.FRIES];
       for (let c = 0; c < this.cols; c++) {
         for (let r = this.rows - 1; r >= 0; r--) {
@@ -655,7 +796,6 @@ export class Match3GameEngine {
       await new Promise(res => setTimeout(res, 220));
 
       cascadeIndex++;
-      // Check if newly dropped items formed a 3-in-a-line match
       currentMatches = this.findLineMatches();
     }
 
@@ -672,11 +812,10 @@ export class Match3GameEngine {
     }
   }
 
-  // Handle cell clicks
   handleCellClick(r, c, renderCallback) {
     if (this.isProcessing) return;
 
-    // Check if player clicked a cluster of 3 or more identical items
+    // Direct tap on group of 3+
     const group = this.getConnectedGroup(r, c);
     if (group.length >= 3) {
       this.selected = null;
@@ -684,7 +823,7 @@ export class Match3GameEngine {
       return;
     }
 
-    // Otherwise handle swap selection
+    // Swap selection
     if (!this.selected) {
       SoundFXEngine.playClick();
       this.selected = { row: r, col: c };
@@ -694,7 +833,6 @@ export class Match3GameEngine {
       this.selected = null;
 
       if (first.row === r && first.col === c) {
-        // Deselect
         renderCallback();
         return;
       }
@@ -786,7 +924,7 @@ class SnackPopClient {
           </div>
         </div>
 
-        <div style="background: rgba(245, 158, 11, 0.18); border: 1px solid #F59E0B; border-radius: 14px; padding: 10px 14px; margin-bottom: 16px; font-size: 0.85rem; text-align: center; color: #FEF3C7;">
+        <div class="instruction-banner">
           ✨ <strong>HOW TO PLAY:</strong> Swap adjacent foods or tap <strong>3 or more identical items</strong> to merge and pop them!
         </div>
 
@@ -894,7 +1032,7 @@ class SnackPopClient {
             </div>
           </div>
 
-          <div style="font-size: 0.8rem; color: #FDE047; margin-bottom: 8px; text-align: center;">
+          <div class="board-hint-tip">
             💡 Swap adjacent items or tap <strong>3+ identical foods</strong> to merge & pop!
           </div>
 
